@@ -497,11 +497,36 @@ VALUES (
 );
 
 -- ============================================================
--- STEP 6: CREATE ADMIN PROFILE
+-- STEP 6: CREATE ADMIN AUTH USER AND PROFILE
 -- ============================================================
 
--- This creates the admin profile for the existing user
--- Make sure the user with this ID exists in Supabase Auth first!
+-- Create the Auth user first (this is required before creating the profile)
+-- NOTE: In production, create users via Supabase Auth Dashboard instead
+INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at, updated_at)
+VALUES (
+  '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
+  'admin@bfp.gov.ph',
+  crypt('Admin@BFP2026!', gen_salt('bf')),
+  now(),
+  '{"role": "admin"}',
+  now(),
+  now()
+);
+
+-- Create the identity record (required for Auth to work)
+INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
+  '{"email": "admin@bfp.gov.ph", "sub": "2207a830-aee8-4cc7-8f2d-64f3dee3ae0c"}',
+  'email',
+  '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
+  now(),
+  now(),
+  now()
+);
+
+-- Now create the admin profile (references the Auth user we just created)
 INSERT INTO profiles (user_id, first_name, last_name, email, contact_number, role, approval_status)
 VALUES (
   '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
