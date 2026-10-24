@@ -21,8 +21,8 @@ export default function CreateStationForm() {
     if (res?.error) {
       setError(res.error);
       setLoading(false);
-    } else if (res?.stationId) {
-      router.push(`/stations/${res.stationId}`);
+    } else if (res?.success) {
+      router.push("/dashboard");
       router.refresh();
     }
   };
