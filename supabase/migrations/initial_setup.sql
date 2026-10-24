@@ -1,19 +1,49 @@
--- Migration: Initial Schema for BFP Surigao
--- This migration sets up the core database structure with RLS policies
+-- Migration: Complete Initial Setup for BFP Surigao
+-- This single file includes schema, RLS policies, and triggers
+-- Safe to run multiple times - uses IF NOT EXISTS and DROP IF EXISTS
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create enum types
-CREATE TYPE user_role AS ENUM ('admin', 'station_user');
-CREATE TYPE approval_status AS ENUM ('pending', 'approved', 'rejected');
-CREATE TYPE equipment_status AS ENUM ('operational', 'maintenance', 'out_of_service');
-CREATE TYPE incident_severity AS ENUM ('low', 'medium', 'high', 'critical');
-CREATE TYPE fire_incident_status AS ENUM ('active', 'resolved', 'investigating');
-CREATE TYPE ems_incident_status AS ENUM ('active', 'resolved', 'transferred');
+-- Create enum types (with existence checks)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+    CREATE TYPE user_role AS ENUM ('admin', 'station_user');
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'approval_status') THEN
+    CREATE TYPE approval_status AS ENUM ('pending', 'approved', 'rejected');
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'equipment_status') THEN
+    CREATE TYPE equipment_status AS ENUM ('operational', 'maintenance', 'out_of_service');
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'incident_severity') THEN
+    CREATE TYPE incident_severity AS ENUM ('low', 'medium', 'high', 'critical');
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fire_incident_status') THEN
+    CREATE TYPE fire_incident_status AS ENUM ('active', 'resolved', 'investigating');
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ems_incident_status') THEN
+    CREATE TYPE ems_incident_status AS ENUM ('active', 'resolved', 'transferred');
+  END IF;
+END $$;
 
 -- Create profiles table (extends Supabase auth.users)
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   first_name VARCHAR(100) NOT NULL,
@@ -29,14 +59,14 @@ CREATE TABLE profiles (
 );
 
 -- Create index on user_id for faster lookups
-CREATE INDEX idx_profiles_user_id ON profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_user_id ON profiles(user_id);
 -- Create index on email for login lookups
-CREATE INDEX idx_profiles_email ON profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
 -- Create index on approval_status for admin approval queries
-CREATE INDEX idx_profiles_approval_status ON profiles(approval_status);
+CREATE INDEX IF NOT EXISTS idx_profiles_approval_status ON profiles(approval_status);
 
 -- Create stations table
-CREATE TABLE stations (
+CREATE TABLE IF NOT EXISTS stations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   address TEXT NOT NULL,
@@ -49,12 +79,12 @@ CREATE TABLE stations (
 );
 
 -- Create index on district for regional queries
-CREATE INDEX idx_stations_district ON stations(district);
+CREATE INDEX IF NOT EXISTS idx_stations_district ON stations(district);
 -- Create index on is_active for filtering active stations
-CREATE INDEX idx_stations_is_active ON stations(is_active);
+CREATE INDEX IF NOT EXISTS idx_stations_is_active ON stations(is_active);
 
 -- Create station_members table (links profiles to stations)
-CREATE TABLE station_members (
+CREATE TABLE IF NOT EXISTS station_members (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
@@ -68,12 +98,12 @@ CREATE TABLE station_members (
 );
 
 -- Create indexes for station membership queries
-CREATE INDEX idx_station_members_profile_id ON station_members(profile_id);
-CREATE INDEX idx_station_members_station_id ON station_members(station_id);
-CREATE INDEX idx_station_members_is_active ON station_members(is_active);
+CREATE INDEX IF NOT EXISTS idx_station_members_profile_id ON station_members(profile_id);
+CREATE INDEX IF NOT EXISTS idx_station_members_station_id ON station_members(station_id);
+CREATE INDEX IF NOT EXISTS idx_station_members_is_active ON station_members(is_active);
 
 -- Create equipment table
-CREATE TABLE equipment (
+CREATE TABLE IF NOT EXISTS equipment (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
@@ -86,11 +116,11 @@ CREATE TABLE equipment (
 );
 
 -- Create indexes for equipment queries
-CREATE INDEX idx_equipment_station_id ON equipment(station_id);
-CREATE INDEX idx_equipment_status ON equipment(status);
+CREATE INDEX IF NOT EXISTS idx_equipment_station_id ON equipment(station_id);
+CREATE INDEX IF NOT EXISTS idx_equipment_status ON equipment(status);
 
 -- Create fire_incidents table
-CREATE TABLE fire_incidents (
+CREATE TABLE IF NOT EXISTS fire_incidents (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
   incident_type VARCHAR(100) NOT NULL,
@@ -105,12 +135,12 @@ CREATE TABLE fire_incidents (
 );
 
 -- Create indexes for incident queries
-CREATE INDEX idx_fire_incidents_station_id ON fire_incidents(station_id);
-CREATE INDEX idx_fire_incidents_status ON fire_incidents(status);
-CREATE INDEX idx_fire_incidents_reported_at ON fire_incidents(reported_at DESC);
+CREATE INDEX IF NOT EXISTS idx_fire_incidents_station_id ON fire_incidents(station_id);
+CREATE INDEX IF NOT EXISTS idx_fire_incidents_status ON fire_incidents(status);
+CREATE INDEX IF NOT EXISTS idx_fire_incidents_reported_at ON fire_incidents(reported_at DESC);
 
 -- Create ems_incidents table
-CREATE TABLE ems_incidents (
+CREATE TABLE IF NOT EXISTS ems_incidents (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
   incident_type VARCHAR(100) NOT NULL,
@@ -125,12 +155,12 @@ CREATE TABLE ems_incidents (
 );
 
 -- Create indexes for EMS incident queries
-CREATE INDEX idx_ems_incidents_station_id ON ems_incidents(station_id);
-CREATE INDEX idx_ems_incidents_status ON ems_incidents(status);
-CREATE INDEX idx_ems_incidents_reported_at ON ems_incidents(reported_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ems_incidents_station_id ON ems_incidents(station_id);
+CREATE INDEX IF NOT EXISTS idx_ems_incidents_status ON ems_incidents(status);
+CREATE INDEX IF NOT EXISTS idx_ems_incidents_reported_at ON ems_incidents(reported_at DESC);
 
 -- Create audit_logs table
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   action VARCHAR(100) NOT NULL,
@@ -144,9 +174,9 @@ CREATE TABLE audit_logs (
 );
 
 -- Create indexes for audit log queries
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX idx_audit_logs_table_name ON audit_logs(table_name);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_table_name ON audit_logs(table_name);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at DESC);
 
 -- Enable Row Level Security on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -157,77 +187,109 @@ ALTER TABLE fire_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ems_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Security Definer helper functions to prevent RLS recursion
-CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = public
-STABLE
-AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM profiles
-    WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-  );
-$$;
+-- Drop existing policies if they exist (to allow updates)
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
+DROP POLICY IF EXISTS "Service role can insert profiles" ON profiles;
 
-CREATE OR REPLACE FUNCTION public.is_approved()
-RETURNS BOOLEAN
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = public
-STABLE
-AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM profiles
-    WHERE user_id = auth.uid() AND approval_status = 'approved'
-  );
-$$;
+DROP POLICY IF EXISTS "Approved users can view active stations" ON stations;
+DROP POLICY IF EXISTS "Admins can view all stations" ON stations;
+DROP POLICY IF EXISTS "Admins can manage stations" ON stations;
+
+DROP POLICY IF EXISTS "Users can view own memberships" ON station_members;
+DROP POLICY IF EXISTS "Station users can view station members" ON station_members;
+DROP POLICY IF EXISTS "Admins can view all station members" ON station_members;
+DROP POLICY IF EXISTS "Admins can manage station members" ON station_members;
+
+DROP POLICY IF EXISTS "Station users can view station equipment" ON equipment;
+DROP POLICY IF EXISTS "Admins can view all equipment" ON equipment;
+DROP POLICY IF EXISTS "Station users can insert equipment" ON equipment;
+DROP POLICY IF EXISTS "Station users can update equipment" ON equipment;
+DROP POLICY IF EXISTS "Admins can manage equipment" ON equipment;
+
+DROP POLICY IF EXISTS "Station users can view fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Admins can view all fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Station users can insert fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Station users can update fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Admins can manage fire incidents" ON fire_incidents;
+
+DROP POLICY IF EXISTS "Station users can view EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Admins can view all EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Station users can insert EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Station users can update EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Admins can manage EMS incidents" ON ems_incidents;
+
+DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_logs;
+DROP POLICY IF EXISTS "Service role can insert audit logs" ON audit_logs;
 
 -- RLS Policies for profiles
--- Users can view their own profile
 CREATE POLICY "Users can view own profile"
   ON profiles FOR SELECT
   USING (auth.uid() = user_id);
 
--- Users can update their own profile
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id)
+  WITH CHECK (
+    auth.uid() = user_id AND
+    role = (SELECT role FROM profiles WHERE id = profiles.id) AND
+    approval_status = (SELECT approval_status FROM profiles WHERE id = profiles.id)
+  );
 
--- Admins can view all profiles
 CREATE POLICY "Admins can view all profiles"
   ON profiles FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Admins can update any profile
 CREATE POLICY "Admins can update any profile"
   ON profiles FOR UPDATE
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Service role can insert profiles (for registration)
 CREATE POLICY "Service role can insert profiles"
   ON profiles FOR INSERT
   WITH CHECK (true);
 
 -- RLS Policies for stations
--- Approved users can view active stations
 CREATE POLICY "Approved users can view active stations"
   ON stations FOR SELECT
-  USING (is_active = true AND public.is_approved());
+  USING (
+    is_active = true AND
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND approval_status = 'approved'
+    )
+  );
 
--- Admins can view all stations
 CREATE POLICY "Admins can view all stations"
   ON stations FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Admins can insert, update, delete stations
 CREATE POLICY "Admins can manage stations"
   ON stations FOR ALL
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
 -- RLS Policies for station_members
--- Users can view their own station memberships
 CREATE POLICY "Users can view own memberships"
   ON station_members FOR SELECT
   USING (
@@ -237,7 +299,6 @@ CREATE POLICY "Users can view own memberships"
     )
   );
 
--- Station users can view members of their stations
 CREATE POLICY "Station users can view station members"
   ON station_members FOR SELECT
   USING (
@@ -251,18 +312,25 @@ CREATE POLICY "Station users can view station members"
     )
   );
 
--- Admins can view all station members
 CREATE POLICY "Admins can view all station members"
   ON station_members FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Admins can manage station members
 CREATE POLICY "Admins can manage station members"
   ON station_members FOR ALL
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
 -- RLS Policies for equipment
--- Station users can view equipment of their stations
 CREATE POLICY "Station users can view station equipment"
   ON equipment FOR SELECT
   USING (
@@ -276,12 +344,15 @@ CREATE POLICY "Station users can view station equipment"
     )
   );
 
--- Admins can view all equipment
 CREATE POLICY "Admins can view all equipment"
   ON equipment FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Station users can insert equipment for their stations
 CREATE POLICY "Station users can insert equipment"
   ON equipment FOR INSERT
   WITH CHECK (
@@ -295,7 +366,6 @@ CREATE POLICY "Station users can insert equipment"
     )
   );
 
--- Station users can update equipment of their stations
 CREATE POLICY "Station users can update equipment"
   ON equipment FOR UPDATE
   USING (
@@ -309,13 +379,16 @@ CREATE POLICY "Station users can update equipment"
     )
   );
 
--- Admins can manage all equipment
 CREATE POLICY "Admins can manage equipment"
   ON equipment FOR ALL
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
 -- RLS Policies for fire_incidents
--- Station users can view incidents of their stations
 CREATE POLICY "Station users can view fire incidents"
   ON fire_incidents FOR SELECT
   USING (
@@ -329,12 +402,15 @@ CREATE POLICY "Station users can view fire incidents"
     )
   );
 
--- Admins can view all fire incidents
 CREATE POLICY "Admins can view all fire incidents"
   ON fire_incidents FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Station users can insert incidents for their stations
 CREATE POLICY "Station users can insert fire incidents"
   ON fire_incidents FOR INSERT
   WITH CHECK (
@@ -348,7 +424,6 @@ CREATE POLICY "Station users can insert fire incidents"
     )
   );
 
--- Station users can update incidents of their stations
 CREATE POLICY "Station users can update fire incidents"
   ON fire_incidents FOR UPDATE
   USING (
@@ -362,12 +437,16 @@ CREATE POLICY "Station users can update fire incidents"
     )
   );
 
--- Admins can manage all fire incidents
 CREATE POLICY "Admins can manage fire incidents"
   ON fire_incidents FOR ALL
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- RLS Policies for ems_incidents (similar to fire_incidents)
+-- RLS Policies for ems_incidents
 CREATE POLICY "Station users can view EMS incidents"
   ON ems_incidents FOR SELECT
   USING (
@@ -383,7 +462,12 @@ CREATE POLICY "Station users can view EMS incidents"
 
 CREATE POLICY "Admins can view all EMS incidents"
   ON ems_incidents FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
 CREATE POLICY "Station users can insert EMS incidents"
   ON ems_incidents FOR INSERT
@@ -413,15 +497,23 @@ CREATE POLICY "Station users can update EMS incidents"
 
 CREATE POLICY "Admins can manage EMS incidents"
   ON ems_incidents FOR ALL
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
 -- RLS Policies for audit_logs
--- Only admins can view audit logs
 CREATE POLICY "Admins can view audit logs"
   ON audit_logs FOR SELECT
-  USING (public.is_admin());
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
+    )
+  );
 
--- Service role can insert audit logs (via triggers or admin actions)
 CREATE POLICY "Service role can insert audit logs"
   ON audit_logs FOR INSERT
   WITH CHECK (true);
@@ -434,6 +526,14 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Drop existing triggers if they exist
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+DROP TRIGGER IF EXISTS update_stations_updated_at ON stations;
+DROP TRIGGER IF EXISTS update_station_members_updated_at ON station_members;
+DROP TRIGGER IF EXISTS update_equipment_updated_at ON equipment;
+DROP TRIGGER IF EXISTS update_fire_incidents_updated_at ON fire_incidents;
+DROP TRIGGER IF EXISTS update_ems_incidents_updated_at ON ems_incidents;
 
 -- Create triggers for updated_at
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
@@ -453,21 +553,3 @@ CREATE TRIGGER update_fire_incidents_updated_at BEFORE UPDATE ON fire_incidents
 
 CREATE TRIGGER update_ems_incidents_updated_at BEFORE UPDATE ON ems_incidents
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- ============================================================================
--- Initial Seed Data
--- ============================================================================
-
--- Insert sample station (idempotent: only inserts if it does not already exist)
-INSERT INTO stations (name, address, contact_number, email, district, is_active)
-SELECT 
-  'BFP Surigao City Main Station',
-  'Surigao City, Surigao del Norte',
-  '086-123-4567',
-  'surigao.main@bfp.gov.ph',
-  'Surigao City',
-  true
-WHERE NOT EXISTS (
-  SELECT 1 FROM stations WHERE name = 'BFP Surigao City Main Station'
-);
-

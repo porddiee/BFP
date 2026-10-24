@@ -10,12 +10,8 @@ import {
   Truck,
   AlertTriangle,
   Ambulance,
-  LifeBuoy,
-  PlusCircle,
-  MapPin,
-  Phone
+  LifeBuoy
 } from "lucide-react";
-import CreateStationForm from "@/components/stations/create-station-form";
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
@@ -229,16 +225,12 @@ export default async function DashboardPage() {
               </Link>
             </div>
           ) : (
-            /* Station User without a station: show creation form */
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-900 max-w-2xl mx-auto space-y-2">
-                <span className="font-bold text-sm block">Station Setup Required</span>
-                <p className="text-xs leading-relaxed">
-                  As a Station Officer, your first step is to establish your local fire station. Once established, you will be able to manage your station&apos;s personnel, equipment, and incident reports.
-                </p>
-              </div>
-
-              <CreateStationForm />
+            /* Station User without a station: show message */
+            <div className="p-6 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-900 max-w-2xl mx-auto space-y-2">
+              <span className="font-bold text-sm block">Station Setup Required</span>
+              <p className="text-xs leading-relaxed">
+                As a Station Officer, your first step is to establish your local fire station. Contact an administrator to register your station.
+              </p>
             </div>
           )}
         </>
