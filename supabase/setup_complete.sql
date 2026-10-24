@@ -206,28 +206,18 @@ CREATE POLICY "Users can view own profile"
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = user_id)
-  WITH CHECK (
-    auth.uid() = user_id AND
-    role = (SELECT role FROM profiles WHERE id = profiles.id) AND
-    approval_status = (SELECT approval_status FROM profiles WHERE id = profiles.id)
-  );
+  WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Admins can view all profiles"
   ON profiles FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Admins can update any profile"
   ON profiles FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Service role can insert profiles"
@@ -248,19 +238,13 @@ CREATE POLICY "Approved users can view active stations"
 CREATE POLICY "Admins can view all stations"
   ON stations FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Admins can manage stations"
   ON stations FOR ALL
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 -- RLS Policies for station_members
@@ -276,11 +260,11 @@ CREATE POLICY "Users can view own memberships"
 CREATE POLICY "Station users can view station members"
   ON station_members FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    station_members.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = station_members.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -289,19 +273,13 @@ CREATE POLICY "Station users can view station members"
 CREATE POLICY "Admins can view all station members"
   ON station_members FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Admins can manage station members"
   ON station_members FOR ALL
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 -- RLS Policies for equipment
@@ -321,20 +299,17 @@ CREATE POLICY "Station users can view station equipment"
 CREATE POLICY "Admins can view all equipment"
   ON equipment FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Station users can insert equipment"
   ON equipment FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    equipment.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = equipment.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -343,11 +318,11 @@ CREATE POLICY "Station users can insert equipment"
 CREATE POLICY "Station users can update equipment"
   ON equipment FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    equipment.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = equipment.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -356,21 +331,18 @@ CREATE POLICY "Station users can update equipment"
 CREATE POLICY "Admins can manage equipment"
   ON equipment FOR ALL
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 -- RLS Policies for fire_incidents
 CREATE POLICY "Station users can view fire incidents"
   ON fire_incidents FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    fire_incidents.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = fire_incidents.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -379,20 +351,17 @@ CREATE POLICY "Station users can view fire incidents"
 CREATE POLICY "Admins can view all fire incidents"
   ON fire_incidents FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Station users can insert fire incidents"
   ON fire_incidents FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    fire_incidents.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = fire_incidents.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -401,11 +370,11 @@ CREATE POLICY "Station users can insert fire incidents"
 CREATE POLICY "Station users can update fire incidents"
   ON fire_incidents FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    fire_incidents.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = fire_incidents.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -414,21 +383,18 @@ CREATE POLICY "Station users can update fire incidents"
 CREATE POLICY "Admins can manage fire incidents"
   ON fire_incidents FOR ALL
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 -- RLS Policies for ems_incidents
 CREATE POLICY "Station users can view EMS incidents"
   ON ems_incidents FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    ems_incidents.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = ems_incidents.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -437,20 +403,17 @@ CREATE POLICY "Station users can view EMS incidents"
 CREATE POLICY "Admins can view all EMS incidents"
   ON ems_incidents FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Station users can insert EMS incidents"
   ON ems_incidents FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    ems_incidents.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = ems_incidents.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -459,11 +422,11 @@ CREATE POLICY "Station users can insert EMS incidents"
 CREATE POLICY "Station users can update EMS incidents"
   ON ems_incidents FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM station_members sm
+    ems_incidents.station_id IN (
+      SELECT sm.station_id 
+      FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
-      WHERE sm.station_id = ems_incidents.station_id
-        AND p.user_id = auth.uid()
+      WHERE p.user_id = auth.uid()
         AND p.approval_status = 'approved'
         AND sm.is_active = true
     )
@@ -472,20 +435,14 @@ CREATE POLICY "Station users can update EMS incidents"
 CREATE POLICY "Admins can manage EMS incidents"
   ON ems_incidents FOR ALL
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 -- RLS Policies for audit_logs
 CREATE POLICY "Admins can view audit logs"
   ON audit_logs FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND role = 'admin' AND approval_status = 'approved'
-    )
+    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
   );
 
 CREATE POLICY "Service role can insert audit logs"
