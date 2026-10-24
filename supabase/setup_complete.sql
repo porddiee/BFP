@@ -1,49 +1,59 @@
--- Migration: Complete Initial Setup for BFP Surigao
--- This single file includes schema, RLS policies, and triggers
--- Safe to run multiple times - uses IF NOT EXISTS and DROP IF EXISTS
+-- Complete Setup Script for BFP Surigao
+-- This script will:
+-- 1. Clear all existing tables and types
+-- 2. Recreate the database schema
+-- 3. Insert sample data
+-- 4. Create admin profile for existing user
+
+-- ============================================================
+-- STEP 1: DROP EXISTING OBJECTS (CLEAN SLATE)
+-- ============================================================
+
+-- Drop triggers
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+DROP TRIGGER IF EXISTS update_stations_updated_at ON stations;
+DROP TRIGGER IF EXISTS update_station_members_updated_at ON station_members;
+DROP TRIGGER IF EXISTS update_equipment_updated_at ON equipment;
+DROP TRIGGER IF EXISTS update_fire_incidents_updated_at ON fire_incidents;
+DROP TRIGGER IF EXISTS update_ems_incidents_updated_at ON ems_incidents;
+
+-- Drop tables
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS ems_incidents CASCADE;
+DROP TABLE IF EXISTS fire_incidents CASCADE;
+DROP TABLE IF EXISTS equipment CASCADE;
+DROP TABLE IF EXISTS station_members CASCADE;
+DROP TABLE IF EXISTS stations CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+
+-- Drop types
+DROP TYPE IF EXISTS ems_incident_status CASCADE;
+DROP TYPE IF EXISTS fire_incident_status CASCADE;
+DROP TYPE IF EXISTS incident_severity CASCADE;
+DROP TYPE IF EXISTS equipment_status CASCADE;
+DROP TYPE IF EXISTS approval_status CASCADE;
+DROP TYPE IF EXISTS user_role CASCADE;
+
+-- Drop function
+DROP FUNCTION IF EXISTS update_updated_at_column CASCADE;
+
+-- ============================================================
+-- STEP 2: CREATE SCHEMA
+-- ============================================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create enum types (with existence checks)
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-    CREATE TYPE user_role AS ENUM ('admin', 'station_user');
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'approval_status') THEN
-    CREATE TYPE approval_status AS ENUM ('pending', 'approved', 'rejected');
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'equipment_status') THEN
-    CREATE TYPE equipment_status AS ENUM ('operational', 'maintenance', 'out_of_service');
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'incident_severity') THEN
-    CREATE TYPE incident_severity AS ENUM ('low', 'medium', 'high', 'critical');
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fire_incident_status') THEN
-    CREATE TYPE fire_incident_status AS ENUM ('active', 'resolved', 'investigating');
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ems_incident_status') THEN
-    CREATE TYPE ems_incident_status AS ENUM ('active', 'resolved', 'transferred');
-  END IF;
-END $$;
+-- Create enum types
+CREATE TYPE user_role AS ENUM ('admin', 'station_user');
+CREATE TYPE approval_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE equipment_status AS ENUM ('operational', 'maintenance', 'out_of_service');
+CREATE TYPE incident_severity AS ENUM ('low', 'medium', 'high', 'critical');
+CREATE TYPE fire_incident_status AS ENUM ('active', 'resolved', 'investigating');
+CREATE TYPE ems_incident_status AS ENUM ('active', 'resolved', 'transferred');
 
 -- Create profiles table (extends Supabase auth.users)
-CREATE TABLE IF NOT EXISTS profiles (
+CREATE TABLE profiles (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   first_name VARCHAR(100) NOT NULL,
@@ -58,15 +68,13 @@ CREATE TABLE IF NOT EXISTS profiles (
   CONSTRAINT check_valid_approval CHECK (approval_status IN ('pending', 'approved', 'rejected'))
 );
 
--- Create index on user_id for faster lookups
-CREATE INDEX IF NOT EXISTS idx_profiles_user_id ON profiles(user_id);
--- Create index on email for login lookups
-CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
--- Create index on approval_status for admin approval queries
-CREATE INDEX IF NOT EXISTS idx_profiles_approval_status ON profiles(approval_status);
+-- Create indexes
+CREATE INDEX idx_profiles_user_id ON profiles(user_id);
+CREATE INDEX idx_profiles_email ON profiles(email);
+CREATE INDEX idx_profiles_approval_status ON profiles(approval_status);
 
 -- Create stations table
-CREATE TABLE IF NOT EXISTS stations (
+CREATE TABLE stations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   address TEXT NOT NULL,
@@ -78,13 +86,12 @@ CREATE TABLE IF NOT EXISTS stations (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create index on district for regional queries
-CREATE INDEX IF NOT EXISTS idx_stations_district ON stations(district);
--- Create index on is_active for filtering active stations
-CREATE INDEX IF NOT EXISTS idx_stations_is_active ON stations(is_active);
+-- Create indexes
+CREATE INDEX idx_stations_district ON stations(district);
+CREATE INDEX idx_stations_is_active ON stations(is_active);
 
 -- Create station_members table (links profiles to stations)
-CREATE TABLE IF NOT EXISTS station_members (
+CREATE TABLE station_members (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
@@ -97,13 +104,13 @@ CREATE TABLE IF NOT EXISTS station_members (
   CONSTRAINT unique_active_membership UNIQUE (profile_id, station_id, is_active)
 );
 
--- Create indexes for station membership queries
-CREATE INDEX IF NOT EXISTS idx_station_members_profile_id ON station_members(profile_id);
-CREATE INDEX IF NOT EXISTS idx_station_members_station_id ON station_members(station_id);
-CREATE INDEX IF NOT EXISTS idx_station_members_is_active ON station_members(is_active);
+-- Create indexes
+CREATE INDEX idx_station_members_profile_id ON station_members(profile_id);
+CREATE INDEX idx_station_members_station_id ON station_members(station_id);
+CREATE INDEX idx_station_members_is_active ON station_members(is_active);
 
 -- Create equipment table
-CREATE TABLE IF NOT EXISTS equipment (
+CREATE TABLE equipment (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
@@ -115,12 +122,12 @@ CREATE TABLE IF NOT EXISTS equipment (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes for equipment queries
-CREATE INDEX IF NOT EXISTS idx_equipment_station_id ON equipment(station_id);
-CREATE INDEX IF NOT EXISTS idx_equipment_status ON equipment(status);
+-- Create indexes
+CREATE INDEX idx_equipment_station_id ON equipment(station_id);
+CREATE INDEX idx_equipment_status ON equipment(status);
 
 -- Create fire_incidents table
-CREATE TABLE IF NOT EXISTS fire_incidents (
+CREATE TABLE fire_incidents (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
   incident_type VARCHAR(100) NOT NULL,
@@ -134,13 +141,13 @@ CREATE TABLE IF NOT EXISTS fire_incidents (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes for incident queries
-CREATE INDEX IF NOT EXISTS idx_fire_incidents_station_id ON fire_incidents(station_id);
-CREATE INDEX IF NOT EXISTS idx_fire_incidents_status ON fire_incidents(status);
-CREATE INDEX IF NOT EXISTS idx_fire_incidents_reported_at ON fire_incidents(reported_at DESC);
+-- Create indexes
+CREATE INDEX idx_fire_incidents_station_id ON fire_incidents(station_id);
+CREATE INDEX idx_fire_incidents_status ON fire_incidents(status);
+CREATE INDEX idx_fire_incidents_reported_at ON fire_incidents(reported_at DESC);
 
 -- Create ems_incidents table
-CREATE TABLE IF NOT EXISTS ems_incidents (
+CREATE TABLE ems_incidents (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   station_id UUID NOT NULL REFERENCES stations(id) ON DELETE CASCADE,
   incident_type VARCHAR(100) NOT NULL,
@@ -154,13 +161,13 @@ CREATE TABLE IF NOT EXISTS ems_incidents (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes for EMS incident queries
-CREATE INDEX IF NOT EXISTS idx_ems_incidents_station_id ON ems_incidents(station_id);
-CREATE INDEX IF NOT EXISTS idx_ems_incidents_status ON ems_incidents(status);
-CREATE INDEX IF NOT EXISTS idx_ems_incidents_reported_at ON ems_incidents(reported_at DESC);
+-- Create indexes
+CREATE INDEX idx_ems_incidents_station_id ON ems_incidents(station_id);
+CREATE INDEX idx_ems_incidents_status ON ems_incidents(status);
+CREATE INDEX idx_ems_incidents_reported_at ON ems_incidents(reported_at DESC);
 
 -- Create audit_logs table
-CREATE TABLE IF NOT EXISTS audit_logs (
+CREATE TABLE audit_logs (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   action VARCHAR(100) NOT NULL,
@@ -173,10 +180,14 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes for audit log queries
-CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_table_name ON audit_logs(table_name);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at DESC);
+-- Create indexes
+CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_table_name ON audit_logs(table_name);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
+
+-- ============================================================
+-- STEP 3: CREATE RLS POLICIES
+-- ============================================================
 
 -- Enable Row Level Security on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -186,43 +197,6 @@ ALTER TABLE equipment ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fire_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ems_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist (to allow updates)
-DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
-DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
-DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
-DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
-DROP POLICY IF EXISTS "Service role can insert profiles" ON profiles;
-
-DROP POLICY IF EXISTS "Approved users can view active stations" ON stations;
-DROP POLICY IF EXISTS "Admins can view all stations" ON stations;
-DROP POLICY IF EXISTS "Admins can manage stations" ON stations;
-
-DROP POLICY IF EXISTS "Users can view own memberships" ON station_members;
-DROP POLICY IF EXISTS "Station users can view station members" ON station_members;
-DROP POLICY IF EXISTS "Admins can view all station members" ON station_members;
-DROP POLICY IF EXISTS "Admins can manage station members" ON station_members;
-
-DROP POLICY IF EXISTS "Station users can view station equipment" ON equipment;
-DROP POLICY IF EXISTS "Admins can view all equipment" ON equipment;
-DROP POLICY IF EXISTS "Station users can insert equipment" ON equipment;
-DROP POLICY IF EXISTS "Station users can update equipment" ON equipment;
-DROP POLICY IF EXISTS "Admins can manage equipment" ON equipment;
-
-DROP POLICY IF EXISTS "Station users can view fire incidents" ON fire_incidents;
-DROP POLICY IF EXISTS "Admins can view all fire incidents" ON fire_incidents;
-DROP POLICY IF EXISTS "Station users can insert fire incidents" ON fire_incidents;
-DROP POLICY IF EXISTS "Station users can update fire incidents" ON fire_incidents;
-DROP POLICY IF EXISTS "Admins can manage fire incidents" ON fire_incidents;
-
-DROP POLICY IF EXISTS "Station users can view EMS incidents" ON ems_incidents;
-DROP POLICY IF EXISTS "Admins can view all EMS incidents" ON ems_incidents;
-DROP POLICY IF EXISTS "Station users can insert EMS incidents" ON ems_incidents;
-DROP POLICY IF EXISTS "Station users can update EMS incidents" ON ems_incidents;
-DROP POLICY IF EXISTS "Admins can manage EMS incidents" ON ems_incidents;
-
-DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_logs;
-DROP POLICY IF EXISTS "Service role can insert audit logs" ON audit_logs;
 
 -- RLS Policies for profiles
 CREATE POLICY "Users can view own profile"
@@ -518,6 +492,10 @@ CREATE POLICY "Service role can insert audit logs"
   ON audit_logs FOR INSERT
   WITH CHECK (true);
 
+-- ============================================================
+-- STEP 4: CREATE TRIGGERS
+-- ============================================================
+
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -526,14 +504,6 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Drop existing triggers if they exist
-DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
-DROP TRIGGER IF EXISTS update_stations_updated_at ON stations;
-DROP TRIGGER IF EXISTS update_station_members_updated_at ON station_members;
-DROP TRIGGER IF EXISTS update_equipment_updated_at ON equipment;
-DROP TRIGGER IF EXISTS update_fire_incidents_updated_at ON fire_incidents;
-DROP TRIGGER IF EXISTS update_ems_incidents_updated_at ON ems_incidents;
 
 -- Create triggers for updated_at
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
@@ -553,3 +523,43 @@ CREATE TRIGGER update_fire_incidents_updated_at BEFORE UPDATE ON fire_incidents
 
 CREATE TRIGGER update_ems_incidents_updated_at BEFORE UPDATE ON ems_incidents
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================================
+-- STEP 5: INSERT SAMPLE DATA
+-- ============================================================
+
+-- Insert a sample station
+INSERT INTO stations (name, address, contact_number, email, district, is_active)
+VALUES (
+  'BFP Surigao City Main Station',
+  'Surigao City, Surigao del Norte',
+  '086-123-4567',
+  'surigao.main@bfp.gov.ph',
+  'Surigao City',
+  true
+);
+
+-- ============================================================
+-- STEP 6: CREATE ADMIN PROFILE
+-- ============================================================
+
+-- This creates the admin profile for the existing user
+-- Make sure the user with this ID exists in Supabase Auth first!
+INSERT INTO profiles (user_id, first_name, last_name, email, contact_number, role, approval_status)
+VALUES (
+  '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
+  'Admin',
+  'User',
+  'admin@bfp.gov.ph',
+  '0917-000-0000',
+  'admin',
+  'approved'
+);
+
+-- ============================================================
+-- SETUP COMPLETE
+-- ============================================================
+
+-- You can now log in with:
+-- Email: admin@bfp.gov.ph
+-- Password: Admin@BFP2026!

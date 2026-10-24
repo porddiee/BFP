@@ -21,7 +21,12 @@ export default async function DashboardPage() {
       <div className="text-center py-20 bg-white border border-zinc-200 rounded-2xl max-w-lg mx-auto shadow-sm">
         <AlertTriangle className="w-10 h-10 text-red-600 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-black mb-2">Session Expired</h2>
-        <p className="text-xs text-zinc-500 mb-6">Unable to load profile. Please sign in again.</p>
+        <p className="text-xs text-zinc-500 mb-6">Unable to load profile. This usually means:</p>
+        <ul className="text-xs text-zinc-500 text-left mb-6 space-y-1">
+          <li>• Your profile record hasn't been created in the database</li>
+          <li>• Your profile approval status is not 'approved'</li>
+          <li>• Row Level Security policies are blocking access</li>
+        </ul>
         <Link
           href="/login"
           className="px-6 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs uppercase tracking-wider red-glow"
