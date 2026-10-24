@@ -501,6 +501,7 @@ VALUES (
 -- ============================================================
 
 -- Create the Auth user first (this is required before creating the profile)
+-- ON CONFLICT DO NOTHING - skip if user already exists
 -- NOTE: In production, create users via Supabase Auth Dashboard instead
 INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at, updated_at)
 VALUES (
@@ -511,11 +512,13 @@ VALUES (
   '{"role": "admin"}',
   now(),
   now()
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 -- Create the identity record (required for Auth to work)
+-- Skip if already exists
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
-VALUES (
+SELECT
   gen_random_uuid(),
   '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
   '{"email": "admin@bfp.gov.ph", "sub": "2207a830-aee8-4cc7-8f2d-64f3dee3ae0c"}',
@@ -524,9 +527,12 @@ VALUES (
   now(),
   now(),
   now()
+WHERE NOT EXISTS (
+  SELECT 1 FROM auth.identities WHERE user_id = '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c'
 );
 
--- Now create the admin profile (references the Auth user we just created)
+-- Now create the admin profile (references the Auth user)
+-- Skip if profile already exists
 INSERT INTO profiles (user_id, first_name, last_name, email, contact_number, role, approval_status)
 VALUES (
   '2207a830-aee8-4cc7-8f2d-64f3dee3ae0c',
@@ -536,7 +542,8 @@ VALUES (
   '0917-000-0000',
   'admin',
   'approved'
-);
+)
+ON CONFLICT (user_id) DO NOTHING;
 
 -- ============================================================
 -- SETUP COMPLETE
