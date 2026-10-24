@@ -93,7 +93,8 @@ export async function getCurrentUser() {
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error) {
-    throw new Error(`Failed to get user: ${error.message}`);
+    console.error("Failed to get user:", error);
+    return null;
   }
 
   return user;
@@ -115,10 +116,11 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     .from("profiles")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
-    throw new Error(`Failed to get profile: ${error.message}`);
+    console.error("Failed to get profile:", error);
+    return null;
   }
 
   return data;
