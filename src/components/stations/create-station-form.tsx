@@ -24,6 +24,8 @@ export default function CreateStationForm() {
     } else if (res?.success) {
       router.push("/dashboard");
       router.refresh();
+    } else {
+      setLoading(false);
     }
   };
 
