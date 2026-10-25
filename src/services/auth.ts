@@ -134,9 +134,9 @@ export async function getCurrentProfile(): Promise<Profile | null> {
  * Get profile by user ID (admin only)
  */
 export async function getProfileById(profileId: string): Promise<Profile | null> {
-  const supabase = await createClient();
+  const adminSupabase = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await adminSupabase
     .from("profiles")
     .select("*")
     .eq("id", profileId)
@@ -212,9 +212,9 @@ export async function revokeAdminRole(profileId: string) {
  * Get all pending profiles (admin only)
  */
 export async function getPendingProfiles(): Promise<Profile[]> {
-  const supabase = await createClient();
+  const adminSupabase = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await adminSupabase
     .from("profiles")
     .select("*")
     .eq("approval_status", "pending")

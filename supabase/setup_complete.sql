@@ -213,18 +213,7 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Admins can view all profiles"
-  ON profiles FOR SELECT
-  USING (
-    auth.jwt() ->> 'role' = 'admin'
-  );
-
-CREATE POLICY "Admins can update any profile"
-  ON profiles FOR UPDATE
-  USING (
-    auth.jwt() ->> 'role' = 'admin'
-  );
-
+-- Admin policies removed - admin operations use service role in server actions
 CREATE POLICY "Service role can insert profiles"
   ON profiles FOR INSERT
   WITH CHECK (true);
