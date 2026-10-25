@@ -81,14 +81,19 @@ CREATE TABLE stations (
   contact_number VARCHAR(20),
   email VARCHAR(255),
   district VARCHAR(100),
-  is_active BOOLEAN DEFAULT true,
+  is_active BOOLEAN DEFAULT false,
+  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  approval_status approval_status DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  CONSTRAINT check_valid_station_approval CHECK (approval_status IN ('pending', 'approved', 'rejected'))
 );
 
 -- Create indexes
 CREATE INDEX idx_stations_district ON stations(district);
 CREATE INDEX idx_stations_is_active ON stations(is_active);
+CREATE INDEX idx_stations_approval_status ON stations(approval_status);
+CREATE INDEX idx_stations_created_by ON stations(created_by);
 
 -- Create station_members table (links profiles to stations)
 CREATE TABLE station_members (
@@ -235,10 +240,33 @@ CREATE POLICY "Approved users can view active stations"
     )
   );
 
+CREATE POLICY "Approved users can view their own pending stations"
+  ON stations FOR SELECT
+  USING (
+    NOT is_active AND
+    EXISTS (
+      SELECT 1 FROM station_members sm
+      WHERE sm.station_id = stations.id
+        AND sm.profile_id IN (
+          SELECT id FROM profiles WHERE user_id = auth.uid()
+        )
+    )
+  );
+
 CREATE POLICY "Admins can view all stations"
   ON stations FOR SELECT
   USING (
     (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+  );
+
+CREATE POLICY "Approved users can create pending stations"
+  ON stations FOR INSERT
+  WITH CHECK (
+    NOT is_active AND
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE user_id = auth.uid() AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Admins can manage stations"
@@ -485,15 +513,16 @@ CREATE TRIGGER update_ems_incidents_updated_at BEFORE UPDATE ON ems_incidents
 -- STEP 5: INSERT SAMPLE DATA
 -- ============================================================
 
--- Insert a sample station
-INSERT INTO stations (name, address, contact_number, email, district, is_active)
+-- Insert a sample station (approved and active)
+INSERT INTO stations (name, address, contact_number, email, district, is_active, approval_status)
 VALUES (
   'BFP Surigao City Main Station',
   'Surigao City, Surigao del Norte',
   '086-123-4567',
   'surigao.main@bfp.gov.ph',
   'Surigao City',
-  true
+  true,
+  'approved'
 );
 
 -- ============================================================

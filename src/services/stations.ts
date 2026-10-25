@@ -71,6 +71,27 @@ export async function createStation(stationData: Omit<Station, "id" | "created_a
   return data;
 }
 
+export async function addStationMember(memberData: {
+  profile_id: string;
+  station_id: string;
+  position?: string;
+  rank?: string;
+  is_active?: boolean;
+}) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("station_members")
+    .insert({
+      ...memberData,
+      is_active: memberData.is_active ?? true,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function updateStation(id: string, updates: Partial<Station>) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -92,4 +113,50 @@ export async function deleteStation(id: string) {
     .eq("id", id);
 
   if (error) throw error;
+}
+
+export async function approveStation(stationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("stations")
+    .update({ approval_status: "approved", is_active: true })
+    .eq("id", stationId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function rejectStation(stationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("stations")
+    .update({ approval_status: "rejected", is_active: false })
+    .eq("id", stationId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getPendingStations(): Promise<Station[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("stations")
+      .select("*")
+      .eq("approval_status", "pending")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.warn("getPendingStations error:", error.message);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.warn("getPendingStations exception:", err);
+    return [];
+  }
 }

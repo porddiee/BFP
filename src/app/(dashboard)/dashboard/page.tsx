@@ -1,5 +1,5 @@
 import { getCurrentProfile, getPendingProfiles } from "@/services/auth";
-import { getStations } from "@/services/stations";
+import { getStations, getPendingStations } from "@/services/stations";
 import Link from "next/link";
 import { 
   Building2, 
@@ -40,6 +40,7 @@ export default async function DashboardPage() {
   const isAdmin = profile.role === "admin";
   let stationsCount = 0;
   let pendingCount = 0;
+  let pendingStationsCount = 0;
 
   if (isAdmin) {
     try {
@@ -47,6 +48,8 @@ export default async function DashboardPage() {
       stationsCount = stations.length;
       const pending = await getPendingProfiles();
       pendingCount = pending.length;
+      const pendingStations = await getPendingStations();
+      pendingStationsCount = pendingStations.length;
     } catch (e) {
       console.error("Admin dashboard fetch error:", e);
     }
@@ -77,14 +80,27 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          {isAdmin && pendingCount > 0 && (
-            <Link
-              href="/admin/registrations"
-              className="px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shrink-0"
-            >
-              <ShieldAlert className="w-4 h-4" />
-              <span>Pending Approvals ({pendingCount})</span>
-            </Link>
+          {isAdmin && (pendingCount > 0 || pendingStationsCount > 0) && (
+            <div className="flex gap-2">
+              {pendingCount > 0 && (
+                <Link
+                  href="/admin/registrations"
+                  className="px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shrink-0"
+                >
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>Pending Users ({pendingCount})</span>
+                </Link>
+              )}
+              {pendingStationsCount > 0 && (
+                <Link
+                  href="/stations"
+                  className="px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shrink-0"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>Pending Stations ({pendingStationsCount})</span>
+                </Link>
+              )}
+            </div>
           )}
         </div>
       </div>

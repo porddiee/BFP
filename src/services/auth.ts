@@ -107,8 +107,11 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   const user = await getCurrentUser();
 
   if (!user) {
+    console.log("getCurrentProfile: No user found");
     return null;
   }
+
+  console.log("getCurrentProfile: User ID:", user.id);
 
   const supabase = await createClient();
 
@@ -123,6 +126,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     return null;
   }
 
+  console.log("getCurrentProfile: Profile data:", data);
   return data;
 }
 

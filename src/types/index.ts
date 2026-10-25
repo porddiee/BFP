@@ -45,10 +45,12 @@ export interface Station {
   id: string;
   name: string;
   address: string;
-  contact_number: string;
-  email: string;
-  district: string;
+  contact_number: string | null;
+  email: string | null;
+  district: string | null;
   is_active: boolean;
+  created_by: string | null;
+  approval_status: ApprovalStatus;
   created_at: string;
   updated_at: string;
 }

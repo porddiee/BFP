@@ -1,12 +1,64 @@
 "use server";
 
 import { getCurrentProfile } from "@/services/auth";
-import { getUserStation } from "@/services/stations";
+import { createStation, addStationMember } from "@/services/stations";
 import { revalidatePath } from "next/cache";
 
-// TODO: Implement station creation for station users in Phase 2
+/**
+ * Create a new station (for approved station users)
+ * Creates station with pending status and adds the creator as a member
+ */
 export async function createMyStationAction(formData: FormData) {
-  return { error: "Station creation is currently disabled. Please contact an administrator.", success: false };
+  try {
+    const profile = await getCurrentProfile();
+
+    if (!profile) {
+      return { error: "You must be logged in to create a station.", success: false };
+    }
+
+    if (profile.approval_status !== "approved") {
+      return { error: "Your account must be approved before creating a station.", success: false };
+    }
+
+    const name = formData.get("name") as string;
+    const address = formData.get("address") as string;
+    const contact_number = formData.get("contact_number") as string;
+    const email = formData.get("email") as string;
+    const district = formData.get("district") as string;
+
+    if (!name || !address) {
+      return { error: "Station name and address are required.", success: false };
+    }
+
+    // Create the station with pending status
+    const station = await createStation({
+      name,
+      address,
+      contact_number: contact_number as string | null,
+      email: email as string | null,
+      district: district as string | null,
+      is_active: false,
+      created_by: profile.id,
+      approval_status: "pending",
+    });
+
+    // Add the creator as a station member
+    await addStationMember({
+      profile_id: profile.id,
+      station_id: station.id,
+      position: "Station Commander",
+      rank: "Chief",
+      is_active: true,
+    });
+
+    revalidatePath("/stations");
+    revalidatePath("/dashboard");
+
+    return { success: true, stationId: station.id };
+  } catch (error) {
+    console.error("Station creation error:", error);
+    return { error: "Failed to create station. Please try again.", success: false };
+  }
 }
 
 // TODO: Implement these actions in Phase 2
