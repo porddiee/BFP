@@ -102,6 +102,7 @@ export async function getCurrentUser() {
 
 /**
  * Get the profile for the current user
+ * Auto-creates profile if it doesn't exist
  */
 export async function getCurrentProfile(): Promise<Profile | null> {
   const user = await getCurrentUser();
@@ -124,6 +125,33 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   if (error) {
     console.error("Failed to get profile:", error);
     return null;
+  }
+
+  // Auto-create profile if it doesn't exist
+  if (!data) {
+    console.log("getCurrentProfile: Profile not found, auto-creating");
+    const adminSupabase = createAdminClient();
+    const { data: newProfile, error: createError } = await adminSupabase
+      .from("profiles")
+      .insert({
+        user_id: user.id,
+        first_name: user.user_metadata?.first_name || "User",
+        last_name: user.user_metadata?.last_name || "",
+        email: user.email || "",
+        contact_number: user.user_metadata?.contact_number || null,
+        role: (user.user_metadata?.role as UserRole) || "station_user",
+        approval_status: "pending",
+      })
+      .select()
+      .single();
+
+    if (createError) {
+      console.error("Failed to auto-create profile:", createError);
+      return null;
+    }
+
+    console.log("getCurrentProfile: Auto-created profile:", newProfile);
+    return newProfile;
   }
 
   console.log("getCurrentProfile: Profile data:", data);
