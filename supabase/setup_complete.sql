@@ -518,41 +518,47 @@ VALUES (
 -- STEP 6: CREATE ADMIN PROFILE
 -- ============================================================
 
--- IMPORTANT: Auth users must be created via Supabase Auth Dashboard
--- This SQL only creates the application profile
--- The user_id below should match the Auth user's ID from the Dashboard
+-- This automatically creates an admin profile for the admin@bfp.gov.ph user
+-- If the Auth user doesn't exist yet, this will be skipped
+-- After running this SQL, create the Auth user in Dashboard with email admin@bfp.gov.ph
 
--- Placeholder - user_id will need to be updated with actual Auth user ID
--- Uncomment and update the user_id after creating the Auth user in Dashboard
+-- Note: Update the user_id below to match your actual Auth user ID from Dashboard
+-- Run this query to get your user_id: SELECT id, email FROM auth.users WHERE email = 'admin@bfp.gov.ph';
 
-/*
-INSERT INTO profiles (user_id, first_name, last_name, email, contact_number, role, approval_status)
-VALUES (
-  'REPLACE_WITH_ACTUAL_AUTH_USER_ID',
-  'Admin',
-  'User',
-  'admin@bfp.gov.ph',
-  '0917-000-0000',
-  'admin',
-  'approved'
-)
-ON CONFLICT (user_id) DO NOTHING;
+-- For now, we'll create a placeholder that you can update
+-- Uncomment and update the user_id after creating the Auth user
 
--- Also set the admin role in auth metadata for RLS policies
-UPDATE auth.users
-SET raw_user_meta_data = '{"role": "admin"}'
-WHERE id = 'REPLACE_WITH_ACTUAL_AUTH_USER_ID';
-*/
+DO $$
+DECLARE
+  admin_user_id UUID;
+BEGIN
+  -- Try to find the admin user by email
+  SELECT id INTO admin_user_id FROM auth.users WHERE email = 'admin@bfp.gov.ph' LIMIT 1;
+
+  -- If user exists, create the profile
+  IF admin_user_id IS NOT NULL THEN
+    INSERT INTO profiles (user_id, first_name, last_name, email, contact_number, role, approval_status)
+    VALUES (
+      admin_user_id,
+      'Admin',
+      'User',
+      'admin@bfp.gov.ph',
+      '0917-000-0000',
+      'admin',
+      'approved'
+    )
+    ON CONFLICT (user_id) DO NOTHING;
+  END IF;
+END $$;
 
 -- ============================================================
 -- SETUP COMPLETE
 -- ============================================================
 
--- You can now log in with:
--- Email: admin@bfp.gov.ph
--- Password: (set when creating Auth user in Dashboard)
+-- Next steps:
+-- 1. Create Auth user in Supabase Dashboard with email: admin@bfp.gov.ph
+-- 2. Run this SQL again after creating the user (profile will be auto-created)
+-- 3. Log in with the credentials you set in the Dashboard
 
--- IMPORTANT: After creating the Auth user in Dashboard, run this to set admin metadata:
--- UPDATE auth.users
--- SET raw_user_meta_data = '{"role": "admin"}'
--- WHERE email = 'admin@bfp.gov.ph';
+-- Note: If you already created the Auth user before running this SQL,
+-- the admin profile was automatically created for you.
