@@ -188,6 +188,26 @@ export async function updateProfile(profileId: string, updates: Partial<Profile>
     .update(updates)
     .eq("id", profileId)
     .select()
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to update profile: ${error.message}`);
+  }
+
+  return data;
+}
+
+/**
+ * Update user profile (admin only - bypasses RLS)
+ */
+export async function updateProfileAdmin(profileId: string, updates: Partial<Profile>) {
+  const adminSupabase = createAdminClient();
+
+  const { data, error } = await adminSupabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", profileId)
+    .select()
     .single();
 
   if (error) {
@@ -201,7 +221,7 @@ export async function updateProfile(profileId: string, updates: Partial<Profile>
  * Approve a user's profile (admin only)
  */
 export async function approveProfile(profileId: string) {
-  const profile = await updateProfile(profileId, { approval_status: "approved" });
+  const profile = await updateProfileAdmin(profileId, { approval_status: "approved" });
   if (profile?.user_id) {
     try {
       const adminSupabase = createAdminClient();
@@ -219,21 +239,21 @@ export async function approveProfile(profileId: string) {
  * Reject a user's profile (admin only)
  */
 export async function rejectProfile(profileId: string) {
-  return updateProfile(profileId, { approval_status: "rejected" });
+  return updateProfileAdmin(profileId, { approval_status: "rejected" });
 }
 
 /**
  * Grant admin role to a user (admin only)
  */
 export async function grantAdminRole(profileId: string) {
-  return updateProfile(profileId, { role: "admin" });
+  return updateProfileAdmin(profileId, { role: "admin" });
 }
 
 /**
  * Revoke admin role from a user (admin only)
  */
 export async function revokeAdminRole(profileId: string) {
-  return updateProfile(profileId, { role: "station_user" });
+  return updateProfileAdmin(profileId, { role: "station_user" });
 }
 
 /**
