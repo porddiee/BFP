@@ -216,13 +216,13 @@ CREATE POLICY "Users can update own profile"
 CREATE POLICY "Admins can view all profiles"
   ON profiles FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Admins can update any profile"
   ON profiles FOR UPDATE
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Service role can insert profiles"
@@ -256,7 +256,7 @@ CREATE POLICY "Approved users can view their own pending stations"
 CREATE POLICY "Admins can view all stations"
   ON stations FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Approved users can create pending stations"
@@ -272,7 +272,7 @@ CREATE POLICY "Approved users can create pending stations"
 CREATE POLICY "Admins can manage stations"
   ON stations FOR ALL
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 -- RLS Policies for station_members
@@ -301,13 +301,13 @@ CREATE POLICY "Station users can view station members"
 CREATE POLICY "Admins can view all station members"
   ON station_members FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Admins can manage station members"
   ON station_members FOR ALL
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 -- RLS Policies for equipment
@@ -327,7 +327,7 @@ CREATE POLICY "Station users can view station equipment"
 CREATE POLICY "Admins can view all equipment"
   ON equipment FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Station users can insert equipment"
@@ -359,7 +359,7 @@ CREATE POLICY "Station users can update equipment"
 CREATE POLICY "Admins can manage equipment"
   ON equipment FOR ALL
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 -- RLS Policies for fire_incidents
@@ -379,7 +379,7 @@ CREATE POLICY "Station users can view fire incidents"
 CREATE POLICY "Admins can view all fire incidents"
   ON fire_incidents FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Station users can insert fire incidents"
@@ -411,7 +411,7 @@ CREATE POLICY "Station users can update fire incidents"
 CREATE POLICY "Admins can manage fire incidents"
   ON fire_incidents FOR ALL
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 -- RLS Policies for ems_incidents
@@ -431,7 +431,7 @@ CREATE POLICY "Station users can view EMS incidents"
 CREATE POLICY "Admins can view all EMS incidents"
   ON ems_incidents FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Station users can insert EMS incidents"
@@ -463,14 +463,14 @@ CREATE POLICY "Station users can update EMS incidents"
 CREATE POLICY "Admins can manage EMS incidents"
   ON ems_incidents FOR ALL
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 -- RLS Policies for audit_logs
 CREATE POLICY "Admins can view audit logs"
   ON audit_logs FOR SELECT
   USING (
-    (SELECT role FROM profiles WHERE user_id = auth.uid() LIMIT 1) = 'admin'
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY "Service role can insert audit logs"
@@ -548,6 +548,11 @@ VALUES (
   'approved'
 )
 ON CONFLICT (user_id) DO NOTHING;
+
+-- Also set the admin role in auth metadata for RLS policies
+UPDATE auth.users
+SET raw_user_meta_data = '{"role": "admin"}'
+WHERE id = 'REPLACE_WITH_ACTUAL_AUTH_USER_ID';
 */
 
 -- ============================================================
@@ -556,4 +561,9 @@ ON CONFLICT (user_id) DO NOTHING;
 
 -- You can now log in with:
 -- Email: admin@bfp.gov.ph
--- Password: Admin@BFP2026!
+-- Password: (set when creating Auth user in Dashboard)
+
+-- IMPORTANT: After creating the Auth user in Dashboard, run this to set admin metadata:
+-- UPDATE auth.users
+-- SET raw_user_meta_data = '{"role": "admin"}'
+-- WHERE email = 'admin@bfp.gov.ph';
