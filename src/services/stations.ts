@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { Station } from "@/types";
 
 export async function getStations(): Promise<Station[]> {
@@ -148,22 +147,3 @@ export async function rejectStation(stationId: string) {
   return data;
 }
 
-export async function getPendingStations(): Promise<Station[]> {
-  try {
-    const adminSupabase = createAdminClient();
-    const { data, error } = await adminSupabase
-      .from("stations")
-      .select("*")
-      .eq("approval_status", "pending")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.warn("getPendingStations error:", error.message);
-      return [];
-    }
-    return data || [];
-  } catch (err) {
-    console.warn("getPendingStations exception:", err);
-    return [];
-  }
-}

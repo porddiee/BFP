@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 /**
  * Create a new station (for approved station users)
- * Creates station with pending status and adds the creator as a member
+ * Creates station with automatic approval and adds the creator as a member
  */
 export async function createMyStationAction(formData: FormData) {
   try {
@@ -30,16 +30,16 @@ export async function createMyStationAction(formData: FormData) {
       return { error: "Station name and address are required.", success: false };
     }
 
-    // Create the station with pending status
+    // Create the station with approved status
     const station = await createStation({
       name,
       address,
       contact_number: contact_number as string | null,
       email: email as string | null,
       district: district as string | null,
-      is_active: false,
+      is_active: true,
       created_by: profile.id,
-      approval_status: "pending",
+      approval_status: "approved",
     });
 
     // Add the creator as a station member
