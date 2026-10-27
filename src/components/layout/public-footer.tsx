@@ -18,17 +18,6 @@ export default function PublicFooter() {
             </div>
           </div>
 
-          {/* Portal Navigation Links */}
-          <div className="flex items-center gap-6 text-xs font-semibold text-zinc-600">
-            <Link href="/login" className="hover:text-red-600 transition-colors">
-              Sign In
-            </Link>
-            <span className="text-zinc-300">•</span>
-            <Link href="/register-station" className="hover:text-red-600 transition-colors">
-              Register
-            </Link>
-          </div>
-
           {/* Copyright & Security */}
           <div className="text-xs text-zinc-500 flex items-center gap-2">
             <ShieldCheck className="w-3.5 h-3.5 text-red-600" />
