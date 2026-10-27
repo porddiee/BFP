@@ -1,6 +1,6 @@
--- Update RLS Policies Only (Safe to run multiple times)
--- This script only updates RLS policies without dropping tables
--- Use this to fix RLS issues without losing data
+-- Update RLS Policies and Activate Stations
+-- Safe to run multiple times - updates policies without dropping tables
+-- Also activates any approved stations that are inactive
 
 -- ============================================================
 -- DROP EXISTING POLICIES
@@ -9,8 +9,6 @@
 -- Drop all policies on profiles
 DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
-DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
-DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
 DROP POLICY IF EXISTS "Service role can insert profiles" ON profiles;
 
 -- Drop all policies on stations
@@ -53,7 +51,7 @@ DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_logs;
 DROP POLICY IF EXISTS "Service role can insert audit logs" ON audit_logs;
 
 -- ============================================================
--- RECREATE POLICIES (FIXED VERSIONS)
+-- RECREATE POLICIES (FIXED VERSIONS - use profiles table for admin checks)
 -- ============================================================
 
 -- RLS Policies for profiles
@@ -66,27 +64,7 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Admins can view all profiles"
-  ON profiles FOR SELECT
-  USING (
-    auth.uid() IN (
-      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
-    )
-  );
-
-CREATE POLICY "Admins can update any profile"
-  ON profiles FOR UPDATE
-  USING (
-    auth.uid() IN (
-      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
-    )
-  )
-  WITH CHECK (
-    auth.uid() IN (
-      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
-    )
-  );
-
+-- Admin policies removed - admin operations use service role in server actions
 CREATE POLICY "Service role can insert profiles"
   ON profiles FOR INSERT
   WITH CHECK (true);
@@ -386,3 +364,12 @@ CREATE POLICY "Admins can view audit logs"
 CREATE POLICY "Service role can insert audit logs"
   ON audit_logs FOR INSERT
   WITH CHECK (true);
+
+-- ============================================================
+-- ACTIVATE APPROVED STATIONS
+-- ============================================================
+
+-- Set is_active = true for all approved stations
+UPDATE stations
+SET is_active = true
+WHERE approval_status = 'approved';
