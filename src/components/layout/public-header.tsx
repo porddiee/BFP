@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldAlert, Flame, LogIn } from "lucide-react";
+import { ShieldAlert, LogIn } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export default function PublicHeader() {
   return (
@@ -11,7 +12,7 @@ export default function PublicHeader() {
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3.5 group">
             <div className="w-11 h-11 rounded-xl bg-red-600 flex items-center justify-center red-glow group-hover:scale-105 transition-transform shadow-md">
-              <Flame className="w-6 h-6 text-white" />
+              <Logo size="sm" className="text-white" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">

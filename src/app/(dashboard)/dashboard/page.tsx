@@ -1,17 +1,17 @@
 import { getCurrentProfile, getPendingProfiles } from "@/services/auth";
 import { getStations, getPendingStations } from "@/services/stations";
 import Link from "next/link";
-import { 
-  Building2, 
-  Flame, 
-  ShieldAlert, 
-  ArrowRight, 
+import {
+  Building2,
+  ShieldAlert,
+  ArrowRight,
   Users,
   Truck,
   AlertTriangle,
   Ambulance,
   LifeBuoy
 } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
@@ -148,7 +148,7 @@ export default async function DashboardPage() {
           >
             <div className="flex items-start justify-between mb-6">
               <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <Flame className="w-8 h-8" />
+                <Logo size="lg" />
               </div>
               <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
             </div>

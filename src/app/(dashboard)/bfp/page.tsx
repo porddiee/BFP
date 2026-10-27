@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { LifeBuoy, AlertTriangle, Ambulance, ArrowRight, ArrowLeft, Flame, ShieldAlert, Activity } from "lucide-react";
+import { LifeBuoy, AlertTriangle, Ambulance, ArrowRight, ArrowLeft, ShieldAlert, Activity } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { getStations, getUserStation } from "@/services/stations";
 import { getCurrentProfile } from "@/services/auth";
 
@@ -38,7 +39,7 @@ export default async function BFPCommandPage() {
           <div className="absolute top-0 right-0 w-80 h-full bg-white/10 blur-[80px] pointer-events-none" />
           <div className="relative space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider">
-              <Flame className="w-3.5 h-3.5 text-white" />
+              <Logo size="sm" />
               <span>
                 {isAdmin
                   ? "BFP REGIONAL OPERATIONAL MODULES"

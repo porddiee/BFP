@@ -1,4 +1,5 @@
-import { Clock, ShieldAlert, CheckCircle2, PhoneCall, Mail, ArrowRight, LogOut, Flame } from "lucide-react";
+import { Clock, ShieldAlert, CheckCircle2, PhoneCall, Mail, ArrowRight, LogOut } from "lucide-react";
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 

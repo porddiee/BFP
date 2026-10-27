@@ -3,22 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Flame, 
-  LayoutDashboard, 
-  Building2, 
-  ShieldAlert, 
-  LifeBuoy, 
-  AlertTriangle, 
-  Ambulance, 
-  LogOut, 
-  Pin, 
+import {
+  LayoutDashboard,
+  Building2,
+  ShieldAlert,
+  LifeBuoy,
+  AlertTriangle,
+  Ambulance,
+  LogOut,
+  Pin,
   PinOff,
   Menu,
   X,
   Users,
   Truck
 } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { logoutAction } from "@/app/actions/auth";
 
 interface Props {
@@ -71,7 +71,7 @@ export default function DashboardSidebar({
       {
         name: "BFP Operations",
         href: "/bfp",
-        icon: Flame,
+        icon: AlertTriangle,
         active: pathname.startsWith("/bfp"),
         desc: "RTR, Fire & EMS",
         subItems: [
@@ -127,7 +127,7 @@ export default function DashboardSidebar({
         {
           name: "BFP Operations",
           href: "/bfp",
-          icon: Flame,
+          icon: AlertTriangle,
           active: pathname.startsWith("/bfp"),
           desc: "My Operational Logs",
           subItems: [
@@ -146,7 +146,7 @@ export default function DashboardSidebar({
       <div className="lg:hidden sticky top-0 z-40 bg-white border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow">
-            <Flame className="w-5 h-5" />
+            <Logo size="sm" />
           </div>
           <div>
             <span className="font-black text-sm text-black">BFP SURIGAO</span>
@@ -190,7 +190,7 @@ export default function DashboardSidebar({
               className="flex items-center gap-3 overflow-hidden transition-all group"
             >
               <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white shrink-0 red-glow group-hover:scale-105 transition-transform shadow-md">
-                <Flame className="w-6 h-6" />
+                <Logo size="md" />
               </div>
 
               <div

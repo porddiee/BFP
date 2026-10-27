@@ -1,6 +1,7 @@
 import LoginForm from "@/components/auth/login-form";
 import Link from "next/link";
-import { Flame, ShieldCheck, ArrowLeft, PhoneCall } from "lucide-react";
+import { ShieldCheck, ArrowLeft, PhoneCall } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export default function LoginPage() {
   return (
@@ -14,7 +15,7 @@ export default function LoginPage() {
         <div className="text-center space-y-3">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-black mx-auto p-0.5 red-glow flex items-center justify-center shadow-md">
             <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center border border-red-600/30">
-              <Flame className="w-8 h-8 text-red-600" />
+              <Logo size="md" className="text-red-600" />
             </div>
           </div>
           <div>

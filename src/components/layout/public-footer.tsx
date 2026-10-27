@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Flame, ShieldCheck, Lock } from "lucide-react";
+import { ShieldCheck, Lock } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export default function PublicFooter() {
   return (
@@ -9,7 +10,7 @@ export default function PublicFooter() {
           {/* Brand */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow shadow-sm">
-              <Flame className="w-4 h-4" />
+              <Logo size="sm" />
             </div>
             <div>
               <span className="font-black text-sm tracking-wider text-black">BFP SURIGAO</span>

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Flame, ShieldAlert, LogIn, ArrowRight, Building2, Shield, Lock } from "lucide-react";
+import { ShieldAlert, LogIn, ArrowRight, Building2, Shield, Lock } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export default function PublicHome() {
   return (
@@ -17,7 +18,7 @@ export default function PublicHome() {
         {/* Brand Icon & Heading */}
         <div className="space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-red-600 flex items-center justify-center red-glow mx-auto shadow-lg">
-            <Flame className="w-9 h-9 text-white" />
+            <Logo size="md" className="text-white" />
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-black tracking-tight leading-tight">
