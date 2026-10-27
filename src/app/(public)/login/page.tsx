@@ -1,5 +1,4 @@
 import LoginForm from "@/components/auth/login-form";
-import Link from "next/link";
 import { PhoneCall } from "lucide-react";
 import { Logo } from "@/components/logo";
 import Image from "next/image";
@@ -31,17 +30,7 @@ export default function LoginPage() {
 
           <LoginForm />
 
-          <div className="mt-6 pt-6 border-t border-zinc-100 text-center space-y-4">
-            <p className="text-xs text-zinc-600 font-medium">
-              New station officer or personnel?{" "}
-              <Link
-                href="/register-station"
-                className="text-red-600 hover:text-red-700 font-bold underline underline-offset-4"
-              >
-                Register station access
-              </Link>
-            </p>
-
+          <div className="mt-6 pt-6 border-t border-zinc-100 text-center">
             <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 text-[11px] text-zinc-600 flex items-center justify-center gap-2">
               <PhoneCall className="w-3.5 h-3.5 text-red-600" />
               <span>Duty Dispatch Support: (086) 826-2111</span>
