@@ -11,8 +11,8 @@ export default function PublicHeader() {
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3.5 group">
-            <div className="w-11 h-11 rounded-xl bg-red-600 flex items-center justify-center red-glow group-hover:scale-105 transition-transform shadow-md">
-              <Logo size="sm" className="text-white" />
+            <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center border-2 border-red-600 group-hover:scale-105 transition-transform shadow-md">
+              <Logo size="sm" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
