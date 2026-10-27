@@ -233,12 +233,8 @@ CREATE POLICY "Approved users can view their own pending stations"
   ON stations FOR SELECT
   USING (
     NOT is_active AND
-    EXISTS (
-      SELECT 1 FROM station_members sm
-      WHERE sm.station_id = stations.id
-        AND sm.profile_id IN (
-          SELECT id FROM profiles WHERE user_id = auth.uid()
-        )
+    created_by IN (
+      SELECT id FROM profiles WHERE user_id = auth.uid()
     )
   );
 
@@ -252,9 +248,8 @@ CREATE POLICY "Approved users can create pending stations"
   ON stations FOR INSERT
   WITH CHECK (
     NOT is_active AND
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE user_id = auth.uid() AND approval_status = 'approved'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE approval_status = 'approved'
     )
   );
 
