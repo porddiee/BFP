@@ -13,9 +13,8 @@ DROP POLICY IF EXISTS "Service role can insert profiles" ON profiles;
 
 -- Drop all policies on stations
 DROP POLICY IF EXISTS "Approved users can view active stations" ON stations;
-DROP POLICY IF EXISTS "Approved users can view their own pending stations" ON stations;
 DROP POLICY IF EXISTS "Admins can view all stations" ON stations;
-DROP POLICY IF EXISTS "Approved users can create pending stations" ON stations;
+DROP POLICY IF EXISTS "Approved users can create approved stations" ON stations;
 DROP POLICY IF EXISTS "Admins can manage stations" ON stations;
 
 -- Drop all policies on station_members
@@ -79,15 +78,6 @@ CREATE POLICY "Approved users can view active stations"
     )
   );
 
-CREATE POLICY "Approved users can view their own pending stations"
-  ON stations FOR SELECT
-  USING (
-    NOT is_active AND
-    created_by IN (
-      SELECT id FROM profiles WHERE user_id = auth.uid()
-    )
-  );
-
 CREATE POLICY "Admins can view all stations"
   ON stations FOR SELECT
   USING (
@@ -96,10 +86,11 @@ CREATE POLICY "Admins can view all stations"
     )
   );
 
-CREATE POLICY "Approved users can create pending stations"
+CREATE POLICY "Approved users can create approved stations"
   ON stations FOR INSERT
   WITH CHECK (
-    NOT is_active AND
+    is_active = true AND
+    approval_status = 'approved' AND
     auth.uid() IN (
       SELECT user_id FROM profiles WHERE approval_status = 'approved'
     )
