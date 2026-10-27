@@ -57,7 +57,9 @@ export async function createMyStationAction(formData: FormData) {
     return { success: true, stationId: station.id };
   } catch (error) {
     console.error("Station creation error:", error);
-    return { error: "Failed to create station. Please try again.", success: false };
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error details:", errorMessage);
+    return { error: `Failed to create station: ${errorMessage}`, success: false };
   }
 }
 

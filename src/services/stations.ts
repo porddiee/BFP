@@ -66,9 +66,12 @@ export async function createStation(stationData: Omit<Station, "id" | "created_a
     .from("stations")
     .insert(stationData)
     .select()
-    .single();
+    .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error("createStation error:", error);
+    throw error;
+  }
   return data;
 }
 
@@ -87,9 +90,12 @@ export async function addStationMember(memberData: {
       is_active: memberData.is_active ?? true,
     })
     .select()
-    .single();
+    .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error("addStationMember error:", error);
+    throw error;
+  }
   return data;
 }
 
