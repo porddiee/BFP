@@ -277,13 +277,8 @@ CREATE POLICY "Users can view own memberships"
 CREATE POLICY "Station users can view station members"
   ON station_members FOR SELECT
   USING (
-    station_members.station_id IN (
-      SELECT sm.station_id 
-      FROM station_members sm
-      JOIN profiles p ON sm.profile_id = p.id
-      WHERE p.user_id = auth.uid()
-        AND p.approval_status = 'approved'
-        AND sm.is_active = true
+    station_members.profile_id IN (
+      SELECT p.id FROM profiles p WHERE p.user_id = auth.uid() AND p.approval_status = 'approved'
     )
   );
 
@@ -297,6 +292,14 @@ CREATE POLICY "Admins can manage station members"
   ON station_members FOR ALL
   USING (
     auth.jwt() ->> 'role' = 'admin'
+  );
+
+CREATE POLICY "Users can insert own station membership"
+  ON station_members FOR INSERT
+  WITH CHECK (
+    profile_id IN (
+      SELECT p.id FROM profiles p WHERE p.user_id = auth.uid() AND p.approval_status = 'approved'
+    )
   );
 
 -- RLS Policies for equipment

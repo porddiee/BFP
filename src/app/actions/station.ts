@@ -57,7 +57,12 @@ export async function createMyStationAction(formData: FormData) {
     return { success: true, stationId: station.id };
   } catch (error) {
     console.error("Station creation error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    let errorMessage = "Unknown error";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (error && typeof error === 'object' && 'message' in error) {
+      errorMessage = String(error.message);
+    }
     console.error("Error details:", errorMessage);
     return { error: `Failed to create station: ${errorMessage}`, success: false };
   }
