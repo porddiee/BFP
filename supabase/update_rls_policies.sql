@@ -7,50 +7,50 @@
 -- ============================================================
 
 -- Drop all policies on profiles
-ALTER TABLE profiles DROP POLICY IF EXISTS "Users can view own profile";
-ALTER TABLE profiles DROP POLICY IF EXISTS "Users can update own profile";
-ALTER TABLE profiles DROP POLICY IF EXISTS "Admins can view all profiles";
-ALTER TABLE profiles DROP POLICY IF EXISTS "Admins can update any profile";
-ALTER TABLE profiles DROP POLICY IF EXISTS "Service role can insert profiles";
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
+DROP POLICY IF EXISTS "Service role can insert profiles" ON profiles;
 
 -- Drop all policies on stations
-ALTER TABLE stations DROP POLICY IF EXISTS "Approved users can view active stations";
-ALTER TABLE stations DROP POLICY IF EXISTS "Approved users can view their own pending stations";
-ALTER TABLE stations DROP POLICY IF EXISTS "Admins can view all stations";
-ALTER TABLE stations DROP POLICY IF EXISTS "Approved users can create pending stations";
-ALTER TABLE stations DROP POLICY IF EXISTS "Admins can manage stations";
+DROP POLICY IF EXISTS "Approved users can view active stations" ON stations;
+DROP POLICY IF EXISTS "Approved users can view their own pending stations" ON stations;
+DROP POLICY IF EXISTS "Admins can view all stations" ON stations;
+DROP POLICY IF EXISTS "Approved users can create pending stations" ON stations;
+DROP POLICY IF EXISTS "Admins can manage stations" ON stations;
 
 -- Drop all policies on station_members
-ALTER TABLE station_members DROP POLICY IF EXISTS "Users can view own memberships";
-ALTER TABLE station_members DROP POLICY IF EXISTS "Station users can view station members";
-ALTER TABLE station_members DROP POLICY IF EXISTS "Admins can view all station members";
-ALTER TABLE station_members DROP POLICY IF EXISTS "Admins can manage station members";
-ALTER TABLE station_members DROP POLICY IF EXISTS "Users can insert own station membership";
+DROP POLICY IF EXISTS "Users can view own memberships" ON station_members;
+DROP POLICY IF EXISTS "Station users can view station members" ON station_members;
+DROP POLICY IF EXISTS "Admins can view all station members" ON station_members;
+DROP POLICY IF EXISTS "Admins can manage station members" ON station_members;
+DROP POLICY IF EXISTS "Users can insert own station membership" ON station_members;
 
 -- Drop all policies on equipment
-ALTER TABLE equipment DROP POLICY IF EXISTS "Station users can view station equipment";
-ALTER TABLE equipment DROP POLICY IF EXISTS "Admins can view all equipment";
-ALTER TABLE equipment DROP POLICY IF EXISTS "Station users can insert equipment";
-ALTER TABLE equipment DROP POLICY IF EXISTS "Station users can update equipment";
-ALTER TABLE equipment DROP POLICY IF EXISTS "Admins can manage equipment";
+DROP POLICY IF EXISTS "Station users can view station equipment" ON equipment;
+DROP POLICY IF EXISTS "Admins can view all equipment" ON equipment;
+DROP POLICY IF EXISTS "Station users can insert equipment" ON equipment;
+DROP POLICY IF EXISTS "Station users can update equipment" ON equipment;
+DROP POLICY IF EXISTS "Admins can manage equipment" ON equipment;
 
 -- Drop all policies on fire_incidents
-ALTER TABLE fire_incidents DROP POLICY IF EXISTS "Station users can view fire incidents";
-ALTER TABLE fire_incidents DROP POLICY IF EXISTS "Admins can view all fire incidents";
-ALTER TABLE fire_incidents DROP POLICY IF EXISTS "Station users can insert fire incidents";
-ALTER TABLE fire_incidents DROP POLICY IF EXISTS "Station users can update fire incidents";
-ALTER TABLE fire_incidents DROP POLICY IF EXISTS "Admins can manage fire incidents";
+DROP POLICY IF EXISTS "Station users can view fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Admins can view all fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Station users can insert fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Station users can update fire incidents" ON fire_incidents;
+DROP POLICY IF EXISTS "Admins can manage fire incidents" ON fire_incidents;
 
 -- Drop all policies on ems_incidents
-ALTER TABLE ems_incidents DROP POLICY IF EXISTS "Station users can view EMS incidents";
-ALTER TABLE ems_incidents DROP POLICY IF EXISTS "Admins can view all EMS incidents";
-ALTER TABLE ems_incidents DROP POLICY IF EXISTS "Station users can insert EMS incidents";
-ALTER TABLE ems_incidents DROP POLICY IF EXISTS "Station users can update EMS incidents";
-ALTER TABLE ems_incidents DROP POLICY IF EXISTS "Admins can manage EMS incidents";
+DROP POLICY IF EXISTS "Station users can view EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Admins can view all EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Station users can insert EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Station users can update EMS incidents" ON ems_incidents;
+DROP POLICY IF EXISTS "Admins can manage EMS incidents" ON ems_incidents;
 
 -- Drop all policies on audit_logs
-ALTER TABLE audit_logs DROP POLICY IF EXISTS "Admins can view audit logs";
-ALTER TABLE audit_logs DROP POLICY IF EXISTS "Service role can insert audit logs";
+DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_logs;
+DROP POLICY IF EXISTS "Service role can insert audit logs" ON audit_logs;
 
 -- ============================================================
 -- RECREATE POLICIES (FIXED VERSIONS)
@@ -87,9 +87,6 @@ CREATE POLICY "Admins can update any profile"
     )
   );
 
-CREATE POLICY "Service role can insert profiles"
-  ON profiles FOR INSERT
-  WITH CHECK (true);
 CREATE POLICY "Service role can insert profiles"
   ON profiles FOR INSERT
   WITH CHECK (true);
@@ -184,7 +181,7 @@ CREATE POLICY "Station users can view station equipment"
   ON equipment FOR SELECT
   USING (
     equipment.station_id IN (
-      SELECT sm.station_id 
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -204,8 +201,8 @@ CREATE POLICY "Admins can view all equipment"
 CREATE POLICY "Station users can insert equipment"
   ON equipment FOR INSERT
   WITH CHECK (
-    equipment.station_id IN (
-      SELECT sm.station_id 
+    station_id IN (
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -217,8 +214,18 @@ CREATE POLICY "Station users can insert equipment"
 CREATE POLICY "Station users can update equipment"
   ON equipment FOR UPDATE
   USING (
-    equipment.station_id IN (
-      SELECT sm.station_id 
+    station_id IN (
+      SELECT sm.station_id
+      FROM station_members sm
+      JOIN profiles p ON sm.profile_id = p.id
+      WHERE p.user_id = auth.uid()
+        AND p.approval_status = 'approved'
+        AND sm.is_active = true
+    )
+  )
+  WITH CHECK (
+    station_id IN (
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -240,7 +247,7 @@ CREATE POLICY "Station users can view fire incidents"
   ON fire_incidents FOR SELECT
   USING (
     fire_incidents.station_id IN (
-      SELECT sm.station_id 
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -260,8 +267,8 @@ CREATE POLICY "Admins can view all fire incidents"
 CREATE POLICY "Station users can insert fire incidents"
   ON fire_incidents FOR INSERT
   WITH CHECK (
-    fire_incidents.station_id IN (
-      SELECT sm.station_id 
+    station_id IN (
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -273,8 +280,18 @@ CREATE POLICY "Station users can insert fire incidents"
 CREATE POLICY "Station users can update fire incidents"
   ON fire_incidents FOR UPDATE
   USING (
-    fire_incidents.station_id IN (
-      SELECT sm.station_id 
+    station_id IN (
+      SELECT sm.station_id
+      FROM station_members sm
+      JOIN profiles p ON sm.profile_id = p.id
+      WHERE p.user_id = auth.uid()
+        AND p.approval_status = 'approved'
+        AND sm.is_active = true
+    )
+  )
+  WITH CHECK (
+    station_id IN (
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -296,7 +313,7 @@ CREATE POLICY "Station users can view EMS incidents"
   ON ems_incidents FOR SELECT
   USING (
     ems_incidents.station_id IN (
-      SELECT sm.station_id 
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -316,8 +333,8 @@ CREATE POLICY "Admins can view all EMS incidents"
 CREATE POLICY "Station users can insert EMS incidents"
   ON ems_incidents FOR INSERT
   WITH CHECK (
-    ems_incidents.station_id IN (
-      SELECT sm.station_id 
+    station_id IN (
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
@@ -329,8 +346,18 @@ CREATE POLICY "Station users can insert EMS incidents"
 CREATE POLICY "Station users can update EMS incidents"
   ON ems_incidents FOR UPDATE
   USING (
-    ems_incidents.station_id IN (
-      SELECT sm.station_id 
+    station_id IN (
+      SELECT sm.station_id
+      FROM station_members sm
+      JOIN profiles p ON sm.profile_id = p.id
+      WHERE p.user_id = auth.uid()
+        AND p.approval_status = 'approved'
+        AND sm.is_active = true
+    )
+  )
+  WITH CHECK (
+    station_id IN (
+      SELECT sm.station_id
       FROM station_members sm
       JOIN profiles p ON sm.profile_id = p.id
       WHERE p.user_id = auth.uid()
