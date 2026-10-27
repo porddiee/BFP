@@ -13,6 +13,9 @@ DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
 DROP POLICY IF EXISTS "Service role can insert profiles" ON profiles;
 
+-- Add new drop policies that were missing
+DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_logs;
+
 -- Drop stations policies
 DROP POLICY IF EXISTS "Approved users can view active stations" ON stations;
 DROP POLICY IF EXISTS "Approved users can view their own pending stations" ON stations;
@@ -66,7 +69,30 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
--- Admin policies removed - admin operations use service role in server actions
+CREATE POLICY "Admins can view all profiles"
+  ON profiles FOR SELECT
+  USING (
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
+  );
+
+CREATE POLICY "Admins can update any profile"
+  ON profiles FOR UPDATE
+  USING (
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
+  )
+  WITH CHECK (
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
+  );
+
+CREATE POLICY "Service role can insert profiles"
+  ON profiles FOR INSERT
+  WITH CHECK (true);
 CREATE POLICY "Service role can insert profiles"
   ON profiles FOR INSERT
   WITH CHECK (true);
@@ -93,7 +119,9 @@ CREATE POLICY "Approved users can view their own pending stations"
 CREATE POLICY "Admins can view all stations"
   ON stations FOR SELECT
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Approved users can create pending stations"
@@ -108,7 +136,9 @@ CREATE POLICY "Approved users can create pending stations"
 CREATE POLICY "Admins can manage stations"
   ON stations FOR ALL
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 -- RLS Policies for station_members
@@ -131,13 +161,17 @@ CREATE POLICY "Station users can view station members"
 CREATE POLICY "Admins can view all station members"
   ON station_members FOR SELECT
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Admins can manage station members"
   ON station_members FOR ALL
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Users can insert own station membership"
@@ -165,7 +199,9 @@ CREATE POLICY "Station users can view station equipment"
 CREATE POLICY "Admins can view all equipment"
   ON equipment FOR SELECT
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Station users can insert equipment"
@@ -197,7 +233,9 @@ CREATE POLICY "Station users can update equipment"
 CREATE POLICY "Admins can manage equipment"
   ON equipment FOR ALL
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 -- RLS Policies for fire_incidents
@@ -217,7 +255,9 @@ CREATE POLICY "Station users can view fire incidents"
 CREATE POLICY "Admins can view all fire incidents"
   ON fire_incidents FOR SELECT
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Station users can insert fire incidents"
@@ -249,7 +289,9 @@ CREATE POLICY "Station users can update fire incidents"
 CREATE POLICY "Admins can manage fire incidents"
   ON fire_incidents FOR ALL
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 -- RLS Policies for ems_incidents
@@ -269,7 +311,9 @@ CREATE POLICY "Station users can view EMS incidents"
 CREATE POLICY "Admins can view all EMS incidents"
   ON ems_incidents FOR SELECT
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Station users can insert EMS incidents"
@@ -301,14 +345,18 @@ CREATE POLICY "Station users can update EMS incidents"
 CREATE POLICY "Admins can manage EMS incidents"
   ON ems_incidents FOR ALL
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 -- RLS Policies for audit_logs
 CREATE POLICY "Admins can view audit logs"
   ON audit_logs FOR SELECT
   USING (
-    auth.jwt() ->> 'role' = 'admin'
+    auth.uid() IN (
+      SELECT user_id FROM profiles WHERE role = 'admin' AND approval_status = 'approved'
+    )
   );
 
 CREATE POLICY "Service role can insert audit logs"
