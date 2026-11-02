@@ -143,24 +143,24 @@ export default function DashboardSidebar({
   return (
     <>
       {/* Mobile Menu Trigger Bar */}
-      <div className="lg:hidden sticky top-0 z-40 bg-white border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="lg:hidden sticky top-0 z-50 bg-white border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow">
             <Logo size="sm" />
           </div>
           <div>
-            <span className="font-black text-sm text-black">BFP SURIGAO</span>
-            <span className="text-[10px] text-zinc-500 block leading-none font-semibold">
+            <span className="font-black text-sm sm:text-base text-black">BFP SURIGAO</span>
+            <span className="text-[10px] sm:text-[11px] text-zinc-500 block leading-none font-semibold">
               {isAdmin ? "Regional Command" : "Station Portal"}
             </span>
           </div>
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-lg text-zinc-600 hover:text-black hover:bg-zinc-100"
+          className="p-3 rounded-xl text-zinc-600 hover:text-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors"
           aria-label="Toggle Navigation Menu"
         >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
@@ -168,7 +168,7 @@ export default function DashboardSidebar({
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
         />
       )}
 
@@ -179,7 +179,7 @@ export default function DashboardSidebar({
         className={`fixed top-0 left-0 bottom-0 z-50 bg-white border-r border-zinc-200 shadow-lg flex flex-col justify-between transition-all duration-300 ease-in-out ${
           isPinned ? "w-64" : isExpanded ? "w-64 shadow-2xl" : "w-[72px]"
         } ${
-          mobileOpen ? "translate-x-0 w-64" : "-translate-x-full lg:translate-x-0"
+          mobileOpen ? "translate-x-0 w-72" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Top: Logo & Brand */}
