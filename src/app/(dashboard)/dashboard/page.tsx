@@ -53,24 +53,27 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       {/* Welcome Banner */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
-        <div className="absolute top-0 right-0 w-80 h-full bg-white/10 blur-[80px] pointer-events-none" />
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider">
-              <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-              <span>
+      <div className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+        <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+              <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+              <span className="hidden sm:inline">
                 {isAdmin
                   ? "REGIONAL ADMIN • SURIGAO DEL NORTE"
                   : "STATION OFFICER PORTAL"}
               </span>
+              <span className="sm:hidden">
+                {isAdmin ? "REGIONAL ADMIN" : "STATION OFFICER"}
+              </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight">
               Welcome back, {profile.first_name} {profile.last_name}
             </h1>
-            <p className="text-xs sm:text-sm text-red-100 max-w-2xl">
+            <p className="text-[11px] sm:text-xs lg:text-sm text-red-100 max-w-2xl">
               {isAdmin
                 ? "Manage fire stations across Surigao del Norte. Review personnel, equipment, and operational reports."
                 : "Your account is approved. Manage your station&apos;s personnel, equipment, and incident reports."}
@@ -81,9 +84,9 @@ export default async function DashboardPage() {
             <div className="flex gap-2">
               <Link
                 href="/admin/registrations"
-                className="px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shrink-0"
+                className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 font-bold text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shrink-0"
               >
-                <ShieldAlert className="w-4 h-4" />
+                <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>Pending Users ({pendingCount})</span>
               </Link>
             </div>
@@ -93,35 +96,35 @@ export default async function DashboardPage() {
 
       {/* REGIONAL ADMIN VIEW */}
       {isAdmin && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
           {/* STATIONS Card */}
           <Link
             href="/stations"
-            className="group p-8 sm:p-10 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl"
+            className="group p-5 sm:p-8 lg:p-10 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <Building2 className="w-8 h-8" />
+            <div className="flex items-start justify-between mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
+                <Building2 className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
             </div>
 
-            <h2 className="text-2xl font-black text-black mb-2">Stations</h2>
-            <p className="text-sm text-zinc-600 leading-relaxed mb-6">
+            <h2 className="text-xl sm:text-2xl font-black text-black mb-2">Stations</h2>
+            <p className="text-[11px] sm:text-sm text-zinc-600 leading-relaxed mb-4 sm:mb-6">
               View all registered fire stations across Surigao del Norte. Access each station&apos;s personnel roster and available equipment &amp; services.
             </p>
 
-            <div className="flex items-center gap-6 pt-4 border-t border-zinc-100">
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <Building2 className="w-3.5 h-3.5 text-red-600" />
+            <div className="flex items-center gap-4 sm:gap-6 pt-3 sm:pt-4 border-t border-zinc-100 flex-wrap">
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
+                <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
                 <span><strong className="text-black">{stationsCount}</strong> Active Stations</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <Users className="w-3.5 h-3.5 text-red-600" />
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
+                <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
                 <span>Personnel</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <Truck className="w-3.5 h-3.5 text-red-600" />
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
+                <Truck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
                 <span>Equipment</span>
               </div>
             </div>
@@ -130,31 +133,31 @@ export default async function DashboardPage() {
           {/* BFP Card */}
           <Link
             href="/bfp"
-            className="group p-8 sm:p-10 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl"
+            className="group p-5 sm:p-8 lg:p-10 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
+            <div className="flex items-start justify-between mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
                 <Logo size="lg" />
               </div>
-              <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
             </div>
 
-            <h2 className="text-2xl font-black text-black mb-2">BFP</h2>
-            <p className="text-sm text-zinc-600 leading-relaxed mb-6">
+            <h2 className="text-xl sm:text-2xl font-black text-black mb-2">BFP</h2>
+            <p className="text-[11px] sm:text-sm text-zinc-600 leading-relaxed mb-4 sm:mb-6">
               Bureau of Fire Protection operational modules. Access RTR rescue operations, fire incident reports, and emergency medical services across all stations.
             </p>
 
-            <div className="flex items-center gap-6 pt-4 border-t border-zinc-100">
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <LifeBuoy className="w-3.5 h-3.5 text-red-600" />
+            <div className="flex items-center gap-4 sm:gap-6 pt-3 sm:pt-4 border-t border-zinc-100 flex-wrap">
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
+                <LifeBuoy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
                 <span>RTR</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
+                <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
                 <span>Fire Incidents</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <Ambulance className="w-3.5 h-3.5 text-red-600" />
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
+                <Ambulance className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
                 <span>EMS</span>
               </div>
             </div>
@@ -164,9 +167,9 @@ export default async function DashboardPage() {
 
       {/* STATION USER VIEW */}
       {!isAdmin && (
-        <div className="p-6 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-900 max-w-2xl mx-auto space-y-2">
-          <span className="font-bold text-sm block">Coming Soon in Phase 2</span>
-          <p className="text-xs leading-relaxed">
+        <div className="p-4 sm:p-6 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-900 max-w-2xl mx-auto space-y-2">
+          <span className="font-bold text-xs sm:text-sm block">Coming Soon in Phase 2</span>
+          <p className="text-[11px] sm:text-xs leading-relaxed">
             Station user features will be available in Phase 2. Currently, please use the admin account to manage stations and personnel.
           </p>
         </div>
