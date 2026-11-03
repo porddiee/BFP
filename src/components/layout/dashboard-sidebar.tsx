@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -46,7 +46,25 @@ export default function DashboardSidebar({
   const [isPinned, setIsPinned] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const isExpanded = isHovered || isPinned;
+  // When drawer is open on mobile, text and sub-items must be expanded
+  const isExpanded = isHovered || isPinned || mobileOpen;
+
+  // Lock background scroll on mobile when drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  // Close drawer automatically on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   // Build navigation items dynamically based on role (Regional Admin vs Station User)
   const navItems = [];
@@ -142,25 +160,31 @@ export default function DashboardSidebar({
 
   return (
     <>
-      {/* Mobile Menu Trigger Bar */}
-      <div className="lg:hidden sticky top-0 z-50 bg-white border-b border-zinc-200 px-4 py-3 flex items-center justify-between shadow-sm">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow">
+      {/* Mobile Menu Top Bar */}
+      <div className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between shadow-sm">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow shadow-sm shrink-0">
             <Logo size="sm" />
           </div>
           <div>
-            <span className="font-black text-sm sm:text-base text-black">BFP SURIGAO</span>
-            <span className="text-[10px] sm:text-[11px] text-zinc-500 block leading-none font-semibold">
-              {isAdmin ? "Regional Command" : "Station Portal"}
+            <div className="flex items-center gap-1.5">
+              <span className="font-black text-sm text-black tracking-wide">BFP SURIGAO</span>
+              <span className="bg-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded text-white tracking-wider uppercase">
+                {isAdmin ? "ADMIN" : "STATION"}
+              </span>
+            </div>
+            <span className="text-[10px] text-zinc-500 block leading-tight font-semibold">
+              {isAdmin ? "Regional Command" : userStationName || "Station Portal"}
             </span>
           </div>
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-3 rounded-xl text-zinc-600 hover:text-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors"
+          className="p-2.5 rounded-xl text-zinc-700 hover:text-black hover:bg-zinc-100 active:bg-zinc-200 transition-colors touch-manipulation"
           aria-label="Toggle Navigation Menu"
+          aria-expanded={mobileOpen}
         >
-          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileOpen ? <X className="w-6 h-6 text-red-600" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
@@ -168,25 +192,27 @@ export default function DashboardSidebar({
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+          aria-hidden="true"
         />
       )}
 
-      {/* Automatic Expand Sidebar for Desktop & Drawer for Mobile */}
+      {/* Sidebar: Expanding on Desktop / Drawer on Mobile */}
       <aside
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`fixed top-0 left-0 bottom-0 z-50 bg-white border-r border-zinc-200 shadow-lg flex flex-col justify-between transition-all duration-300 ease-in-out ${
-          isPinned ? "w-64" : isExpanded ? "w-64 shadow-2xl" : "w-[72px]"
+        className={`fixed top-0 left-0 bottom-0 z-50 bg-white border-r border-zinc-200 shadow-xl flex flex-col justify-between transition-all duration-300 ease-in-out ${
+          isPinned ? "lg:w-64" : isExpanded ? "lg:w-64 lg:shadow-2xl" : "lg:w-[72px]"
         } ${
-          mobileOpen ? "translate-x-0 w-72" : "-translate-x-full lg:translate-x-0"
+          mobileOpen ? "translate-x-0 w-[290px] sm:w-80" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Top: Logo & Brand */}
-        <div>
-          <div className="h-16 px-4 flex items-center justify-between border-b border-zinc-100">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="h-16 px-4 flex items-center justify-between border-b border-zinc-100 shrink-0">
             <Link
               href="/dashboard"
+              onClick={() => setMobileOpen(false)}
               className="flex items-center gap-3 overflow-hidden transition-all group"
             >
               <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white shrink-0 red-glow group-hover:scale-105 transition-transform shadow-md">
@@ -195,7 +221,7 @@ export default function DashboardSidebar({
 
               <div
                 className={`transition-opacity duration-300 whitespace-nowrap ${
-                  isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                  isExpanded ? "opacity-100" : "opacity-0 pointer-events-none lg:block hidden"
                 }`}
               >
                 <div className="flex items-center gap-1.5">
@@ -204,13 +230,13 @@ export default function DashboardSidebar({
                     {isAdmin ? "ADMIN" : "STATION"}
                   </span>
                 </div>
-                <span className="text-[10px] text-zinc-500 font-semibold block">
+                <span className="text-[10px] text-zinc-500 font-semibold block truncate max-w-[150px]">
                   {isAdmin ? "Regional Command" : userStationName || "Station Command"}
                 </span>
               </div>
             </Link>
 
-            {/* Pin Toggle Button */}
+            {/* Desktop Pin Toggle Button */}
             {isExpanded && (
               <button
                 onClick={() => setIsPinned(!isPinned)}
@@ -220,10 +246,19 @@ export default function DashboardSidebar({
                 {isPinned ? <PinOff className="w-4 h-4 text-red-600" /> : <Pin className="w-4 h-4" />}
               </button>
             )}
+
+            {/* Mobile Close Button */}
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="lg:hidden p-2 rounded-xl text-zinc-400 hover:text-black hover:bg-zinc-100 transition-colors"
+              aria-label="Close Navigation Menu"
+            >
+              <X className="w-5 h-5 text-zinc-600" />
+            </button>
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-160px)]">
+          <nav className="p-3 space-y-1.5 overflow-y-auto flex-1 overscroll-contain">
             {navItems.map((item: any) => {
               const Icon = item.icon;
               return (
@@ -231,10 +266,10 @@ export default function DashboardSidebar({
                   <Link
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`relative flex items-center gap-3.5 px-3 py-3 rounded-xl text-xs font-bold transition-all group ${
+                    className={`relative flex items-center gap-3.5 px-3 py-3 rounded-xl text-xs font-bold transition-all group touch-manipulation min-h-[46px] ${
                       item.active
                         ? "bg-red-50 text-red-600 border border-red-200/80 shadow-sm"
-                        : "text-zinc-600 hover:text-black hover:bg-zinc-100"
+                        : "text-zinc-600 hover:text-black hover:bg-zinc-100 active:bg-zinc-200"
                     }`}
                   >
                     {/* Active Bar Indicator */}
@@ -253,13 +288,13 @@ export default function DashboardSidebar({
                     {/* Text Label & Subtext */}
                     <div
                       className={`flex-1 transition-opacity duration-300 overflow-hidden whitespace-nowrap ${
-                        isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                        isExpanded ? "opacity-100" : "opacity-0 pointer-events-none lg:block hidden"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-black truncate max-w-[130px]">{item.name}</span>
+                        <span className="text-sm font-black truncate max-w-[150px]">{item.name}</span>
                         {item.badge && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shrink-0">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shrink-0 ml-1">
                             {item.badge}
                           </span>
                         )}
@@ -280,13 +315,13 @@ export default function DashboardSidebar({
                             key={sub.name}
                             href={sub.href}
                             onClick={() => setMobileOpen(false)}
-                            className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                            className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-semibold transition-colors touch-manipulation min-h-[38px] ${
                               sub.active
                                 ? "bg-red-100/70 text-red-700 font-bold"
-                                : "text-zinc-500 hover:text-black hover:bg-zinc-100/70"
+                                : "text-zinc-500 hover:text-black hover:bg-zinc-100/70 active:bg-zinc-200"
                             }`}
                           >
-                            <SubIcon className="w-3.5 h-3.5 shrink-0" />
+                            <SubIcon className="w-4 h-4 shrink-0" />
                             <span>{sub.name}</span>
                           </Link>
                         );
@@ -300,7 +335,7 @@ export default function DashboardSidebar({
         </div>
 
         {/* Bottom: User Profile & Logout */}
-        <div className="p-3 border-t border-zinc-100 bg-zinc-50/50">
+        <div className="p-3 border-t border-zinc-100 bg-zinc-50/70 shrink-0">
           {profile && (
             <div className="flex items-center gap-3 p-2 rounded-xl mb-2">
               <div className="w-9 h-9 rounded-full bg-red-100 border border-red-200 flex items-center justify-center text-xs font-black text-red-600 shrink-0">
@@ -309,7 +344,7 @@ export default function DashboardSidebar({
 
               <div
                 className={`flex-1 transition-opacity duration-300 overflow-hidden whitespace-nowrap ${
-                  isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                  isExpanded ? "opacity-100" : "opacity-0 pointer-events-none lg:block hidden"
                 }`}
               >
                 <span className="text-xs font-bold text-black block truncate leading-tight">
@@ -326,12 +361,12 @@ export default function DashboardSidebar({
           <form action={logoutAction}>
             <button
               type="submit"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-600 hover:text-red-600 hover:bg-red-50 transition-colors group"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-zinc-600 hover:text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors group touch-manipulation min-h-[42px]"
             >
               <LogOut className="w-5 h-5 text-zinc-400 group-hover:text-red-600 shrink-0" />
               <span
                 className={`transition-opacity duration-300 whitespace-nowrap ${
-                  isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                  isExpanded ? "opacity-100" : "opacity-0 pointer-events-none lg:block hidden"
                 }`}
               >
                 Sign Out

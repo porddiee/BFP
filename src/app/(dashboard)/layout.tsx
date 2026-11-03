@@ -31,8 +31,8 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex">
-      {/* Automatic Expand Sidebar */}
+    <div className="min-h-screen bg-white text-zinc-900 flex flex-col lg:flex-row">
+      {/* Automatic Expand Sidebar for Desktop & Mobile Header/Drawer */}
       <DashboardSidebar
         profile={profile}
         isAdmin={isAdmin}
@@ -42,8 +42,8 @@ export default async function DashboardLayout({
       />
 
       {/* Main Content Area (Offset for collapsed sidebar width on desktop) */}
-      <div className="flex-1 min-w-0 lg:pl-[72px] flex flex-col min-h-screen">
-        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-16 lg:pt-6 lg:py-8">
+      <div className="flex-1 min-w-0 lg:pl-[72px] flex flex-col">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           {children}
         </main>
       </div>

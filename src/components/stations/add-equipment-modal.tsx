@@ -39,15 +39,15 @@ export default function AddEquipmentModal({ stationId }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-all red-glow flex items-center gap-1.5 shadow-md shrink-0"
+        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs uppercase tracking-wider transition-all red-glow flex items-center justify-center gap-1.5 shadow-md shrink-0 touch-manipulation min-h-[44px]"
       >
         <PlusCircle className="w-4 h-4" />
         <span>Add Apparatus / PPE</span>
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 space-y-5 animate-scaleUp">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-zinc-200 space-y-4 max-h-[92vh] overflow-y-auto overscroll-contain animate-scaleUp">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold">
@@ -57,7 +57,7 @@ export default function AddEquipmentModal({ stationId }: Props) {
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-black hover:bg-zinc-100"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-black hover:bg-zinc-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -70,7 +70,7 @@ export default function AddEquipmentModal({ stationId }: Props) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-bold text-zinc-700">
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs font-bold text-zinc-700">
               <div>
                 <label className="block uppercase tracking-wider mb-1">Equipment / Apparatus Name</label>
                 <input
@@ -78,17 +78,17 @@ export default function AddEquipmentModal({ stationId }: Props) {
                   name="name"
                   required
                   placeholder="e.g. Major Pumper Engine 102"
-                  className="w-full px-3 py-2 rounded-xl border border-zinc-200 text-black text-xs font-medium focus:outline-none focus:border-red-600"
+                  className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 text-black text-sm sm:text-xs font-medium focus:outline-none focus:border-red-600 min-h-[42px]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block uppercase tracking-wider mb-1">Type / Category</label>
                   <select
                     name="type"
                     defaultValue="Fire Truck"
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 text-black text-xs font-medium focus:outline-none focus:border-red-600 bg-white"
+                    className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 text-black text-sm sm:text-xs font-medium focus:outline-none focus:border-red-600 bg-white min-h-[42px]"
                   >
                     <option value="Fire Truck">Primary Fire Engine</option>
                     <option value="Water Tanker">Water Tender Tanker</option>
@@ -105,7 +105,7 @@ export default function AddEquipmentModal({ stationId }: Props) {
                     name="serial_number"
                     defaultValue="SRG-BFP-00"
                     placeholder="e.g. SAA-4091"
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 text-black text-xs font-medium focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 text-black text-sm sm:text-xs font-medium focus:outline-none focus:border-red-600 min-h-[42px]"
                   />
                 </div>
               </div>
@@ -115,7 +115,7 @@ export default function AddEquipmentModal({ stationId }: Props) {
                 <select
                   name="status"
                   defaultValue="operational"
-                  className="w-full px-3 py-2 rounded-xl border border-zinc-200 text-black text-xs font-medium focus:outline-none focus:border-red-600 bg-white"
+                  className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 text-black text-sm sm:text-xs font-medium focus:outline-none focus:border-red-600 bg-white min-h-[42px]"
                 >
                   <option value="operational">Operational / Available</option>
                   <option value="maintenance">Under Maintenance</option>
@@ -123,18 +123,18 @@ export default function AddEquipmentModal({ stationId }: Props) {
                 </select>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
+              <div className="pt-2 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 text-zinc-600 font-bold hover:bg-zinc-50"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-600 font-bold hover:bg-zinc-50 active:bg-zinc-100 flex items-center justify-center min-h-[44px] touch-manipulation"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold red-glow flex items-center gap-1.5 shadow-md disabled:opacity-50"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold red-glow flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 min-h-[44px] touch-manipulation"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlusCircle className="w-4 h-4" />}
                   <span>Save Equipment</span>

@@ -64,52 +64,54 @@ export default async function StationEquipmentPage({
       <div>
         <Link
           href={`/stations/${stationId}`}
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to {station.name}</span>
         </Link>
 
         {/* Station Equipment Header */}
-        <div className="p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
-              <Truck className="w-7 h-7" />
+        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
+              <Truck className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
                   Station Equipment & Services
                 </span>
                 <span className="text-[10px] text-zinc-400">•</span>
-                <span className="text-[10px] font-semibold text-zinc-600">{station.name}</span>
+                <span className="text-[10px] font-semibold text-zinc-600 break-words">{station.name}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
                 Available Fire Trucks & PPEs
               </h1>
-              <p className="text-xs text-zinc-600 mt-1">
+              <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
                 Inventory of frontline apparatus, protective equipment readiness, and operational services registered to this station.
               </p>
             </div>
           </div>
 
           {/* Quick Metrics & Add Action */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="px-4 py-3 rounded-xl bg-zinc-50 border border-zinc-200 text-center">
-              <span className="block text-xl font-black text-black">{apparatusList.length}</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Apparatus</span>
-            </div>
-            <div className="px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-              <span className="block text-xl font-black text-emerald-700">
-                {dbEquipment.length > 0 ? `${readinessPct}%` : "N/A"}
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Readiness</span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 flex-1 sm:flex-initial">
+              <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-zinc-50 border border-zinc-200 text-center">
+                <span className="block text-lg sm:text-xl font-black text-black">{apparatusList.length}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-500">Apparatus</span>
+              </div>
+              <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+                <span className="block text-lg sm:text-xl font-black text-emerald-700">
+                  {dbEquipment.length > 0 ? `${readinessPct}%` : "N/A"}
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-700">Readiness</span>
+              </div>
             </div>
             {isOwner ? (
               <AddEquipmentModal stationId={stationId} />
             ) : isAdmin ? (
-              <div className="px-3.5 py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-center flex items-center gap-1.5 text-zinc-500">
-                <Lock className="w-3.5 h-3.5" />
+              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-center flex items-center justify-center gap-1.5 text-zinc-500">
+                <Lock className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Regional Oversight (Read-Only)</span>
               </div>
             ) : null}
@@ -178,7 +180,7 @@ export default async function StationEquipmentPage({
                   </span>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
+                <div className="pt-3 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-zinc-500">
                   <span>Serial / Plate: <strong className="text-black font-mono">{truck.serial_number}</strong></span>
                   <span>Category: <strong className="text-black">{truck.type}</strong></span>
                 </div>
@@ -205,25 +207,25 @@ export default async function StationEquipmentPage({
         ) : (
           <div className="bg-white rounded-2xl border-2 border-zinc-200 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full min-w-[500px] text-left text-xs">
                 <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="py-3.5 px-6">Equipment Name</th>
-                    <th className="py-3.5 px-6">Type</th>
-                    <th className="py-3.5 px-6">Serial / Tag</th>
-                    <th className="py-3.5 px-6 text-right">Status</th>
+                    <th className="py-3 px-4 sm:px-6">Equipment Name</th>
+                    <th className="py-3 px-4 sm:px-6">Type</th>
+                    <th className="py-3 px-4 sm:px-6">Serial / Tag</th>
+                    <th className="py-3 px-4 sm:px-6 text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 font-medium">
                   {ppeList.map((item) => (
                     <tr key={item.id} className="hover:bg-zinc-50/70 transition-colors">
-                      <td className="py-4 px-6 font-bold text-black flex items-center gap-2">
+                      <td className="py-3.5 px-4 sm:px-6 font-bold text-black flex items-center gap-2">
                         <Shield className="w-4 h-4 text-red-600 shrink-0" />
                         <span>{item.name}</span>
                       </td>
-                      <td className="py-4 px-6 text-zinc-600">{item.type}</td>
-                      <td className="py-4 px-6 font-mono text-zinc-500">{item.serial_number}</td>
-                      <td className="py-4 px-6 text-right">
+                      <td className="py-3.5 px-4 sm:px-6 text-zinc-600">{item.type}</td>
+                      <td className="py-3.5 px-4 sm:px-6 font-mono text-zinc-500">{item.serial_number}</td>
+                      <td className="py-3.5 px-4 sm:px-6 text-right">
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <CheckCircle2 className="w-3 h-3" />
                           <span className="capitalize">{item.status}</span>

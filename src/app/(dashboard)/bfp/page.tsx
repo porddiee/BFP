@@ -23,24 +23,24 @@ export default async function BFPCommandPage() {
   const emsHref = !isAdmin && userStation ? `/bfp/ems/${userStation.id}` : "/bfp/ems";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Breadcrumb Navigation */}
       <div>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Dashboard</span>
         </Link>
 
         {/* Page Banner Header */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 text-white relative overflow-hidden shadow-lg">
+        <div className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 text-white relative overflow-hidden shadow-lg">
           <div className="absolute top-0 right-0 w-80 h-full bg-white/10 blur-[80px] pointer-events-none" />
           <div className="relative space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
               <Logo size="sm" />
-              <span>
+              <span className="truncate max-w-[250px] sm:max-w-none">
                 {isAdmin
                   ? "BFP REGIONAL OPERATIONAL MODULES"
                   : userStation
@@ -48,7 +48,7 @@ export default async function BFPCommandPage() {
                   : "BFP OPERATIONAL MODULES"}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight break-words">
               {isAdmin
                 ? "Bureau of Fire Protection Command Choices"
                 : "Station Operational Modules"}
@@ -65,16 +65,16 @@ export default async function BFPCommandPage() {
       </div>
 
       {/* 3 Prominent Choices: RTR, Fire Incident, EMS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {/* 1. RTR Choice */}
         <Link
           href={rtrHref}
-          className="group p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between"
+          className="group p-5 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:bg-zinc-50 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation min-h-[220px]"
         >
           <div>
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <LifeBuoy className="w-7 h-7" />
+            <div className="flex items-start justify-between mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow shrink-0">
+                <LifeBuoy className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
             </div>
@@ -82,18 +82,18 @@ export default async function BFPCommandPage() {
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
               <span>SPECIAL RESCUE UNIT</span>
             </div>
-            <h2 className="text-2xl font-black text-black mb-2">
+            <h2 className="text-xl sm:text-2xl font-black text-black mb-1.5">
               {!isAdmin && userStation ? "My Station RTR" : "RTR"}
             </h2>
-            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2.5">
               Rapid, Tactical, Response
             </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mb-6">
+            <p className="text-xs text-zinc-600 leading-relaxed mb-5">
               Search and rescue operations, specialized typhoon flood interventions, high-angle rope rescue, and tactical emergency missions.
             </p>
           </div>
 
-          <div className="pt-4 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
+          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
             <span>
               {!isAdmin && userStation ? "Open Station RTR Log" : "View Stations RTR"}
             </span>
@@ -104,12 +104,12 @@ export default async function BFPCommandPage() {
         {/* 2. Fire Incident Choice */}
         <Link
           href={fireHref}
-          className="group p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between"
+          className="group p-5 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:bg-zinc-50 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation min-h-[220px]"
         >
           <div>
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <AlertTriangle className="w-7 h-7" />
+            <div className="flex items-start justify-between mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow shrink-0">
+                <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
             </div>
@@ -117,18 +117,18 @@ export default async function BFPCommandPage() {
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
               <span>FIRE SUPPRESSION</span>
             </div>
-            <h2 className="text-2xl font-black text-black mb-2">
+            <h2 className="text-xl sm:text-2xl font-black text-black mb-1.5">
               {!isAdmin && userStation ? "My Fire Incidents" : "Fire Incident"}
             </h2>
-            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2.5">
               Alarms & Structural Reports
             </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mb-6">
+            <p className="text-xs text-zinc-600 leading-relaxed mb-5">
               Active fire dispatches, multi-alarm level escalations, post-fire structural damage reports, and casualty logs.
             </p>
           </div>
 
-          <div className="pt-4 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
+          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
             <span>
               {!isAdmin && userStation ? "Open Fire Incident Log" : "View Stations Incidents"}
             </span>
@@ -139,12 +139,12 @@ export default async function BFPCommandPage() {
         {/* 3. EMS Choice */}
         <Link
           href={emsHref}
-          className="group p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between"
+          className="group p-5 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:bg-zinc-50 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation min-h-[220px]"
         >
           <div>
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <Ambulance className="w-7 h-7" />
+            <div className="flex items-start justify-between mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow shrink-0">
+                <Ambulance className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
             </div>
@@ -152,18 +152,18 @@ export default async function BFPCommandPage() {
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
               <span>MEDICAL RESPONSE</span>
             </div>
-            <h2 className="text-2xl font-black text-black mb-2">
+            <h2 className="text-xl sm:text-2xl font-black text-black mb-1.5">
               {!isAdmin && userStation ? "My EMS Records" : "EMS"}
             </h2>
-            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2.5">
               Emergency Medical Services
             </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mb-6">
+            <p className="text-xs text-zinc-600 leading-relaxed mb-5">
               Pre-hospital emergency care, paramedic triage, road trauma response, ambulance dispatches, and hospital patient transfers.
             </p>
           </div>
 
-          <div className="pt-4 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
+          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
             <span>
               {!isAdmin && userStation ? "Open Station EMS Log" : "View Stations EMS"}
             </span>

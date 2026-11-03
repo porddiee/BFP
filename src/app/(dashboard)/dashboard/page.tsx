@@ -59,21 +59,18 @@ export default async function DashboardPage() {
         <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-1.5 sm:space-y-2">
-            <div className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
               <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
-              <span className="hidden sm:inline">
+              <span>
                 {isAdmin
                   ? "REGIONAL ADMIN • SURIGAO DEL NORTE"
                   : "STATION OFFICER PORTAL"}
               </span>
-              <span className="sm:hidden">
-                {isAdmin ? "REGIONAL ADMIN" : "STATION OFFICER"}
-              </span>
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
               Welcome back, {profile.first_name} {profile.last_name}
             </h1>
-            <p className="text-[11px] sm:text-xs lg:text-sm text-red-100 max-w-2xl">
+            <p className="text-xs sm:text-sm text-red-100 max-w-2xl leading-relaxed">
               {isAdmin
                 ? "Manage fire stations across Surigao del Norte. Review personnel, equipment, and operational reports."
                 : "Your account is approved. Manage your station&apos;s personnel, equipment, and incident reports."}
@@ -81,12 +78,12 @@ export default async function DashboardPage() {
           </div>
 
           {isAdmin && pendingCount > 0 && (
-            <div className="flex gap-2">
+            <div className="flex pt-1 sm:pt-0">
               <Link
                 href="/admin/registrations"
-                className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 font-bold text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shrink-0"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 active:bg-zinc-100 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md shrink-0 touch-manipulation min-h-[44px]"
               >
-                <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <ShieldAlert className="w-4 h-4 shrink-0" />
                 <span>Pending Users ({pendingCount})</span>
               </Link>
             </div>

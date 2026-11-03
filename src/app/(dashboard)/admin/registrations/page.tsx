@@ -51,20 +51,20 @@ export default async function RegistrationsPage() {
       <div>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Dashboard</span>
         </Link>
 
         {/* Page Header */}
-        <div className="p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
-              <ShieldAlert className="w-7 h-7" />
+        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
+              <ShieldAlert className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
                 <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
                   Regional Command Authority
                 </span>
@@ -72,10 +72,10 @@ export default async function RegistrationsPage() {
                   {displayProfiles.length} Awaiting Review
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
                 Station Member Registrations
               </h1>
-              <p className="text-xs text-zinc-600 mt-1">
+              <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
                 Every station officer registering on the portal requires Regional Admin verification before accessing emergency rosters.
               </p>
             </div>

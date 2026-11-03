@@ -50,45 +50,45 @@ export default async function StationFireIncidentsPage({
       <div>
         <Link
           href="/bfp"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to BFP Operations</span>
         </Link>
 
         {/* Station Fire Incidents Header */}
-        <div className="p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
-              <Flame className="w-7 h-7" />
+        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
+              <Flame className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
                   Fire Suppression Incident Log
                 </span>
                 <span className="text-[10px] text-zinc-400">•</span>
-                <span className="text-[10px] font-semibold text-zinc-600">{station.name}</span>
+                <span className="text-[10px] font-semibold text-zinc-600 break-words">{station.name}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
                 Fire Incidents & Alarm History
               </h1>
-              <p className="text-xs text-zinc-600 mt-1">
+              <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
                 Official operational logs of fire alarms, apparatus dispatches, and suppression reports for this station.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="px-4 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-center">
-              <span className="block text-xl font-black text-black">{dbIncidents.length}</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Total Fires</span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+            <div className="px-4 py-2 sm:py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-center flex-1 sm:flex-initial">
+              <span className="block text-lg sm:text-xl font-black text-black">{dbIncidents.length}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-500">Total Fires</span>
             </div>
             {isOwner ? (
               <AddFireIncidentModal stationId={stationId} />
             ) : isAdmin ? (
-              <div className="px-3.5 py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-center flex items-center gap-1.5 text-zinc-500">
-                <Lock className="w-3.5 h-3.5" />
+              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-center flex items-center justify-center gap-1.5 text-zinc-500">
+                <Lock className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Regional Oversight (Read-Only)</span>
               </div>
             ) : null}

@@ -72,10 +72,10 @@ export default function RegistrationApprovalList({ initialProfiles }: Props) {
             return (
               <div
                 key={p.id}
-                className="p-6 rounded-2xl bg-white border-2 border-zinc-200 hover:border-zinc-300 transition-all shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 hover:border-zinc-300 transition-all shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                       <Clock className="w-3 h-3" />
                       Pending Approval
@@ -86,7 +86,7 @@ export default function RegistrationApprovalList({ initialProfiles }: Props) {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-black text-black">
+                    <h3 className="text-base sm:text-lg font-black text-black break-words">
                       {p.first_name} {p.last_name}
                     </h3>
                     <p className="text-xs font-semibold text-red-600 uppercase tracking-wider">
@@ -94,25 +94,29 @@ export default function RegistrationApprovalList({ initialProfiles }: Props) {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-600">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-zinc-600">
                     <div className="flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>{p.email}</span>
+                      <Mail className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                      <a href={`mailto:${p.email}`} className="hover:text-red-600 hover:underline break-all">
+                        {p.email}
+                      </a>
                     </div>
                     {p.contact_number && (
                       <div className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-zinc-400" />
-                        <span>{p.contact_number}</span>
+                        <Phone className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                        <a href={`tel:${p.contact_number}`} className="hover:text-red-600 hover:underline">
+                          {p.contact_number}
+                        </a>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pt-4 md:pt-0 border-t md:border-t-0 border-zinc-100">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 pt-4 md:pt-0 border-t md:border-t-0 border-zinc-100 w-full md:w-auto shrink-0">
                   <button
                     onClick={() => handleReject(p.id)}
                     disabled={isLoading}
-                    className="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-50 font-bold text-xs uppercase tracking-wider transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-50 active:bg-zinc-100 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 touch-manipulation min-h-[44px]"
                   >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4 text-zinc-400" />}
                     <span>Reject</span>
@@ -120,7 +124,7 @@ export default function RegistrationApprovalList({ initialProfiles }: Props) {
                   <button
                     onClick={() => handleApprove(p.id)}
                     disabled={isLoading}
-                    className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-all red-glow flex items-center gap-1.5 disabled:opacity-50 shadow-md"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs uppercase tracking-wider transition-all red-glow flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-md touch-manipulation min-h-[44px]"
                   >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                     <span>Accept & Grant Access</span>

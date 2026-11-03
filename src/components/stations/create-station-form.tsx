@@ -30,21 +30,21 @@ export default function CreateStationForm() {
   };
 
   return (
-    <div className="p-8 rounded-2xl bg-white border-2 border-zinc-200 shadow-lg max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-3 border-b border-zinc-100 pb-4">
-        <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 red-glow">
-          <Building2 className="w-6 h-6" />
+    <div className="p-4 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 shadow-lg max-w-2xl mx-auto space-y-5 sm:space-y-6">
+      <div className="flex items-start sm:items-center gap-3 border-b border-zinc-100 pb-4">
+        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 red-glow shrink-0">
+          <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
         <div>
-          <h2 className="text-xl font-black text-black">Register Your Fire Station</h2>
-          <p className="text-xs text-zinc-500">
+          <h2 className="text-lg sm:text-xl font-black text-black">Register Your Fire Station</h2>
+          <p className="text-xs text-zinc-500 leading-relaxed">
             Enter your official station information to establish your station command hub.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -58,7 +58,7 @@ export default function CreateStationForm() {
             name="name"
             required
             placeholder="e.g. Dapa Municipal Fire Station"
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
+            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[44px]"
           />
         </div>
 
@@ -70,17 +70,17 @@ export default function CreateStationForm() {
               name="district"
               defaultValue="District 1 • Surigao del Norte"
               placeholder="e.g. District 1 • Siargao"
-              className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
+              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[44px]"
             />
           </div>
           <div>
             <label className="block uppercase tracking-wider mb-1.5">Station Hotline / Mobile</label>
             <input
-              type="text"
+              type="tel"
               name="contact_number"
               required
               placeholder="e.g. (086) 826-1111"
-              className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
+              className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[44px]"
             />
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function CreateStationForm() {
             name="address"
             required
             placeholder="e.g. Rizal Street, Poblacion, Surigao City"
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
+            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[44px]"
           />
         </div>
 
@@ -102,15 +102,15 @@ export default function CreateStationForm() {
             type="email"
             name="email"
             placeholder="e.g. station.dapa@bfp.gov.ph"
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
+            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-zinc-200 text-black text-sm font-medium focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[44px]"
           />
         </div>
 
-        <div className="pt-4">
+        <div className="pt-2 sm:pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-all red-glow flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
+            className="w-full py-3.5 px-6 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs uppercase tracking-wider transition-all red-glow flex items-center justify-center gap-2 shadow-md disabled:opacity-50 touch-manipulation min-h-[46px]"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
