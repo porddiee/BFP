@@ -6,6 +6,26 @@ import { ArrowLeft, Users, Shield, Phone, Mail, Clock, CheckCircle2, UserX, Sear
 import { notFound } from "next/navigation";
 import PersonnelRosterView from "@/components/stations/personnel-roster-view";
 import AddPersonnelModal from "@/components/stations/add-personnel-modal";
+import WeeklyDutyDetail from "@/components/stations/weekly-duty-detail";
+
+const FEMALE_NAMES = new Set([
+  "maria", "cristina", "arlene", "leizel", "maricar", "mary", "jane", "sarah", "grace", "ana",
+  "joy", "rose", "michelle", "patricia", "jennifer", "elena", "karen", "bea", "catherine",
+  "christine", "princess", "mae", "fe", "lourdes", "angel", "angela", "carla", "diana", "joan",
+  "rachel", "stephanie", "rowena", "gemma", "cheryl", "luz", "gloria", "fatima", "aileen",
+  "hazel", "ivy", "jasmine", "kim", "kristine", "liezel", "liezl", "lorena", "lorraine", "ma.",
+  "maricel", "marilou", "rhea", "ruby", "sheila", "sheryl", "vanessa", "victoria", "wilma",
+  "zenaida", "teresa", "theresa", "clarisse", "cynthia", "danica", "ella", "emily", "evelyn",
+  "florence", "ginah", "gina", "judy", "julie", "lea", "leah", "liza", "lucille", "marissa"
+]);
+
+function detectGender(firstName: string = ""): "male" | "female" {
+  const parts = firstName.toLowerCase().split(/[\s.-]+/);
+  for (const part of parts) {
+    if (FEMALE_NAMES.has(part)) return "female";
+  }
+  return "male";
+}
 
 export default async function StationPersonnelPage({
   params,
@@ -46,24 +66,29 @@ export default async function StationPersonnelPage({
   }
 
   // Pure database personnel records for this station
-  const finalRoster = members.map((m: any, idx: number) => ({
-    id: m.id,
-    name: m.profiles ? `${m.profiles.first_name} ${m.profiles.last_name}` : `Officer #${idx + 1}`,
-    rank: m.rank || "Fire Officer 1",
-    position: m.position || "Firefighter / EMS",
-    status: idx % 2 === 0 ? ("on_duty" as const) : ("off_duty" as const),
-    shift: idx % 2 === 0 ? "Shift Alpha (08:00 - 20:00)" : "Shift Bravo (20:00 - 08:00)",
-    contact: m.profiles?.contact_number || "Not listed",
-    email: m.profiles?.email || "officer@bfp.gov.ph",
-    badgeNo: `BFP-SRG-${1000 + idx}`,
-    specialization: m.position || "General Fire & Rescue Operations",
-  }));
+  const finalRoster = members.map((m: any, idx: number) => {
+    const firstName = m.profiles?.first_name || "";
+    const gender = detectGender(firstName);
+    return {
+      id: m.id,
+      name: m.profiles ? `${m.profiles.first_name} ${m.profiles.last_name}` : `Officer #${idx + 1}`,
+      rank: m.rank || "Fire Officer 1",
+      position: m.position || "Firefighter / EMS",
+      status: idx % 2 === 0 ? ("on_duty" as const) : ("off_duty" as const),
+      gender: gender as ("male" | "female"),
+      shift: idx % 2 === 0 ? "Shift Alpha (08:00 - 20:00)" : "Shift Bravo (20:00 - 08:00)",
+      contact: m.profiles?.contact_number || "Not listed",
+      email: m.profiles?.email || "officer@bfp.gov.ph",
+      badgeNo: `BFP-SRG-${1000 + idx}`,
+      specialization: m.position || "General Fire & Rescue Operations",
+    };
+  });
 
   const onDutyCount = finalRoster.filter(p => p.status === "on_duty").length;
   const offDutyCount = finalRoster.filter(p => p.status === "off_duty").length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Breadcrumb Navigation */}
       <div>
         <Link
@@ -75,48 +100,42 @@ export default async function StationPersonnelPage({
         </Link>
 
         {/* Station Roster Header */}
-        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
-              <Users className="w-6 h-6 sm:w-7 sm:h-7" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                  Station Personnel Roster
-                </span>
-                <span className="text-[10px] text-zinc-400">•</span>
-                <span className="text-[10px] font-semibold text-zinc-600 break-words">{station.name}</span>
+        <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+                <span>PERSONNEL ROSTER • {station.name.toUpperCase()}</span>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
                 Personnel & Duty Status
               </h1>
-              <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
                 Real-time tracking of active stationed firefighters, shift commanders, and paramedics on duty vs off duty.
               </p>
             </div>
-          </div>
 
-          {/* Quick Metrics & Add Action */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+            {/* Quick Metrics & Add Action */}
+            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
             <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-1 sm:flex-initial">
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-zinc-50 border border-zinc-200 text-center">
-                <span className="block text-lg sm:text-xl font-black text-black">{finalRoster.length}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-500">Total</span>
+              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
+                <span className="block text-lg sm:text-xl font-black text-white">{finalRoster.length}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Total</span>
               </div>
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-                <span className="block text-lg sm:text-xl font-black text-emerald-700">{onDutyCount}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-700">On Duty</span>
+              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/20 border border-white/30 text-center">
+                <span className="block text-lg sm:text-xl font-black text-white">{onDutyCount}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-200">On Duty</span>
               </div>
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-zinc-50 border border-zinc-200 text-center">
-                <span className="block text-lg sm:text-xl font-black text-zinc-600">{offDutyCount}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-500">Off Duty</span>
+              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
+                <span className="block text-lg sm:text-xl font-black text-white/80">{offDutyCount}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-200">Off Duty</span>
               </div>
             </div>
             {isOwner ? (
               <AddPersonnelModal stationId={stationId} />
             ) : isAdmin ? (
-              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-center flex items-center justify-center gap-1.5 text-zinc-500">
+              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center flex items-center justify-center gap-1.5 text-white/80">
                 <Lock className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Regional Oversight (Read-Only)</span>
               </div>
@@ -124,6 +143,12 @@ export default async function StationPersonnelPage({
           </div>
         </div>
       </div>
+    </div>
+
+      {/* Weekly Duty Detail Section */}
+      {finalRoster.length > 0 && (
+        <WeeklyDutyDetail roster={finalRoster} stationName={station.name} />
+      )}
 
       {/* Interactive Personnel Roster or Empty State */}
       {finalRoster.length === 0 ? (

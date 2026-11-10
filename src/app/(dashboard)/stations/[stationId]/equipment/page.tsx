@@ -59,7 +59,7 @@ export default async function StationEquipmentPage({
   const readinessPct = dbEquipment.length > 0 ? Math.round((operationalCount / dbEquipment.length) * 100) : 0;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-8">
       {/* Breadcrumb Navigation */}
       <div>
         <Link
@@ -71,46 +71,40 @@ export default async function StationEquipmentPage({
         </Link>
 
         {/* Station Equipment Header */}
-        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
-              <Truck className="w-6 h-6 sm:w-7 sm:h-7" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                  Station Equipment & Services
-                </span>
-                <span className="text-[10px] text-zinc-400">•</span>
-                <span className="text-[10px] font-semibold text-zinc-600 break-words">{station.name}</span>
+        <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+                <span>EQUIPMENT & FLEET • {station.name.toUpperCase()}</span>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
                 Available Fire Trucks & PPEs
               </h1>
-              <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
                 Inventory of frontline apparatus, protective equipment readiness, and operational services registered to this station.
               </p>
             </div>
-          </div>
 
-          {/* Quick Metrics & Add Action */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+            {/* Quick Metrics & Add Action */}
+            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
             <div className="grid grid-cols-2 gap-2 sm:gap-3 flex-1 sm:flex-initial">
-              <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-zinc-50 border border-zinc-200 text-center">
-                <span className="block text-lg sm:text-xl font-black text-black">{apparatusList.length}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-500">Apparatus</span>
+              <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
+                <span className="block text-lg sm:text-xl font-black text-white">{apparatusList.length}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Apparatus</span>
               </div>
-              <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-                <span className="block text-lg sm:text-xl font-black text-emerald-700">
+              <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/20 border border-white/30 text-center">
+                <span className="block text-lg sm:text-xl font-black text-white">
                   {dbEquipment.length > 0 ? `${readinessPct}%` : "N/A"}
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-700">Readiness</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-200">Readiness</span>
               </div>
             </div>
             {isOwner ? (
               <AddEquipmentModal stationId={stationId} />
             ) : isAdmin ? (
-              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-center flex items-center justify-center gap-1.5 text-zinc-500">
+              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center flex items-center justify-center gap-1.5 text-white/80">
                 <Lock className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Regional Oversight (Read-Only)</span>
               </div>
@@ -118,6 +112,7 @@ export default async function StationEquipmentPage({
           </div>
         </div>
       </div>
+    </div>
 
       {/* SECTION 1: Available Fire Trucks & Heavy Apparatus */}
       <div className="space-y-4">

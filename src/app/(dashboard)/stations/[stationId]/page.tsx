@@ -32,50 +32,46 @@ export default async function StationDetailPage({
         </Link>
 
         {/* Station Info Header */}
-        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
-              <Building2 className="w-6 h-6 sm:w-7 sm:h-7" />
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                {station.district && (
-                  <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                    {station.district}
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-pulse" />
-                  Active Station
-                </span>
+        <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+            <div className="space-y-1.5 sm:space-y-2 flex-1">
+              <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+                <span>{station.district || "BFP Station Unit"} • SURIGAO DEL NORTE</span>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
                 {station.name}
               </h1>
-              <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs text-zinc-600 pt-1">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs text-red-100 pt-1">
                 {station.address && (
                   <div className="flex items-start gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
-                    <span className="break-words">{station.address}</span>
+                    <MapPin className="w-3.5 h-3.5 text-red-200 shrink-0 mt-0.5" />
+                    <span className="break-words leading-relaxed">{station.address}</span>
                   </div>
                 )}
                 {station.contact_number && (
                   <div className="flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                    <a href={`tel:${station.contact_number}`} className="font-semibold text-black hover:text-red-600 hover:underline">
+                    <Phone className="w-3.5 h-3.5 text-white shrink-0" />
+                    <a href={`tel:${station.contact_number}`} className="font-semibold text-white hover:text-red-200 hover:underline">
                       {station.contact_number}
                     </a>
                   </div>
                 )}
                 {station.email && (
                   <div className="flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                    <a href={`mailto:${station.email}`} className="text-zinc-600 hover:text-red-600 hover:underline break-all">
+                    <Mail className="w-3.5 h-3.5 text-red-200 shrink-0" />
+                    <a href={`mailto:${station.email}`} className="text-red-100 hover:text-white hover:underline break-all">
                       {station.email}
                     </a>
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
+              <span className="block text-xs sm:text-sm font-black text-emerald-300 uppercase tracking-wider">Active Command</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Frontline Unit</span>
             </div>
           </div>
         </div>

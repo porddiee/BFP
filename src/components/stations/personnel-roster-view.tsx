@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Search, Phone, Mail, Clock, CheckCircle2, Shield, AlertCircle, ShieldAlert } from "lucide-react";
+import { Users, Search, Phone, Mail, Clock, CheckCircle2, Shield, AlertCircle, ShieldAlert, X } from "lucide-react";
 
-interface PersonItem {
+export interface PersonItem {
   id: string;
   name: string;
   rank: string;
   position: string;
   status: "on_duty" | "off_duty";
+  gender: "male" | "female";
   shift: string;
   contact: string;
   email: string;
@@ -22,59 +23,116 @@ interface Props {
 
 export default function PersonnelRosterView({ roster }: Props) {
   const [filter, setFilter] = useState<"all" | "on_duty" | "off_duty">("all");
+  const [genderFilter, setGenderFilter] = useState<"all" | "male" | "female">("all");
   const [search, setSearch] = useState("");
 
   const filtered = roster.filter((person) => {
-    const matchesFilter = filter === "all" || person.status === filter;
+    const matchesStatus = filter === "all" || person.status === filter;
+    const matchesGender = genderFilter === "all" || person.gender === genderFilter;
     const matchesSearch =
       person.name.toLowerCase().includes(search.toLowerCase()) ||
       person.position.toLowerCase().includes(search.toLowerCase()) ||
       person.rank.toLowerCase().includes(search.toLowerCase()) ||
       person.specialization.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
+    return matchesStatus && matchesGender && matchesSearch;
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-zinc-100">
+        <div>
+          <h2 className="text-base sm:text-lg font-black text-zinc-900 tracking-tight">
+            Station Roster Directory
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">
+            Filter personnel by duty status, gender demographics, or search by rank and name.
+          </p>
+        </div>
+        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider hidden sm:inline">
+          {filtered.length} of {roster.length} Personnel
+        </span>
+      </div>
+
       {/* Controls & Search */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-        {/* Status Filter Buttons */}
-        <div className="flex items-center gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200 overflow-x-auto w-full sm:w-auto scrollbar-none">
-          <button
-            onClick={() => setFilter("all")}
-            className={`px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all shrink-0 touch-manipulation ${
-              filter === "all"
-                ? "bg-white text-black shadow-sm"
-                : "text-zinc-600 hover:text-black"
-            }`}
-          >
-            All ({roster.length})
-          </button>
-          <button
-            onClick={() => setFilter("on_duty")}
-            className={`px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 touch-manipulation ${
-              filter === "on_duty"
-                ? "bg-emerald-600 text-white shadow-sm"
-                : "text-emerald-700 hover:text-emerald-800"
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>On Duty ({roster.filter((p) => p.status === "on_duty").length})</span>
-          </button>
-          <button
-            onClick={() => setFilter("off_duty")}
-            className={`px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all shrink-0 touch-manipulation ${
-              filter === "off_duty"
-                ? "bg-zinc-700 text-white shadow-sm"
-                : "text-zinc-600 hover:text-black"
-            }`}
-          >
-            Off Duty ({roster.filter((p) => p.status === "off_duty").length})
-          </button>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+        {/* Status and Gender Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Status Filter Buttons */}
+          <div className="flex items-center gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200 overflow-x-auto scrollbar-none">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 touch-manipulation ${
+                filter === "all"
+                  ? "bg-white text-black shadow-sm"
+                  : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              All ({roster.length})
+            </button>
+            <button
+              onClick={() => setFilter("on_duty")}
+              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 touch-manipulation ${
+                filter === "on_duty"
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "text-emerald-700 hover:text-emerald-800"
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>On Duty ({roster.filter((p) => p.status === "on_duty").length})</span>
+            </button>
+            <button
+              onClick={() => setFilter("off_duty")}
+              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 touch-manipulation ${
+                filter === "off_duty"
+                  ? "bg-zinc-700 text-white shadow-sm"
+                  : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              Off Duty ({roster.filter((p) => p.status === "off_duty").length})
+            </button>
+          </div>
+
+          {/* Gender Filter Buttons */}
+          <div className="flex items-center gap-1 p-1 bg-zinc-100 rounded-xl border border-zinc-200 overflow-x-auto scrollbar-none">
+            <button
+              onClick={() => setGenderFilter("all")}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 touch-manipulation ${
+                genderFilter === "all"
+                  ? "bg-white text-zinc-900 shadow-sm"
+                  : "text-zinc-500 hover:text-zinc-900"
+              }`}
+              title="Show All Genders"
+            >
+              All Genders
+            </button>
+            <button
+              onClick={() => setGenderFilter("male")}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1 touch-manipulation ${
+                genderFilter === "male"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-blue-700 hover:text-blue-900"
+              }`}
+              title="Show Male Personnel"
+            >
+              <span>Male ({roster.filter((p) => p.gender === "male").length})</span>
+            </button>
+            <button
+              onClick={() => setGenderFilter("female")}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center gap-1 touch-manipulation ${
+                genderFilter === "female"
+                  ? "bg-rose-600 text-white shadow-sm"
+                  : "text-rose-700 hover:text-rose-900"
+              }`}
+              title="Show Female Personnel"
+            >
+              <span>Female ({roster.filter((p) => p.gender === "female").length})</span>
+            </button>
+          </div>
         </div>
 
         {/* Search Bar */}
-        <div className="relative w-full sm:w-72">
+        <div className="relative w-full lg:w-72">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
             <Search className="w-4 h-4" />
           </div>
@@ -83,20 +141,43 @@ export default function PersonnelRosterView({ roster }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name, rank, role..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-zinc-200 text-black text-xs font-medium placeholder-zinc-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[42px]"
+            className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-white border border-zinc-200 text-black text-xs font-medium placeholder-zinc-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10 min-h-[42px]"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600"
+              title="Clear search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Personnel Roster Cards */}
       {filtered.length === 0 ? (
-        <div className="p-8 sm:p-12 text-center bg-white border-2 border-dashed border-zinc-200 rounded-2xl">
-          <p className="text-sm font-semibold text-zinc-500">No personnel found matching the criteria.</p>
+        <div className="p-8 sm:p-12 text-center bg-white border-2 border-dashed border-zinc-200 rounded-2xl space-y-2">
+          <p className="text-sm font-semibold text-zinc-700">No personnel found matching the criteria.</p>
+          {(search || filter !== "all" || genderFilter !== "all") && (
+            <button
+              onClick={() => {
+                setSearch("");
+                setFilter("all");
+                setGenderFilter("all");
+              }}
+              className="text-xs font-bold text-red-600 hover:underline"
+            >
+              Reset all filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map((person) => {
             const isOnDuty = person.status === "on_duty";
+            const isFemale = person.gender === "female";
             return (
               <div
                 key={person.id}
@@ -124,6 +205,17 @@ export default function PersonnelRosterView({ roster }: Props) {
                         </span>
                         <span className="text-[10px] text-zinc-400">•</span>
                         <span className="text-[10px] font-mono text-zinc-400">{person.badgeNo}</span>
+                        <span className="text-[10px] text-zinc-400">•</span>
+                        {/* Gender Badge */}
+                        <span
+                          className={`inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider border ${
+                            isFemale
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : "bg-blue-50 text-blue-700 border-blue-200"
+                          }`}
+                        >
+                          {person.gender}
+                        </span>
                       </div>
                       <h3 className="text-base font-black text-black leading-snug break-words">{person.name}</h3>
                       <p className="text-xs font-semibold text-zinc-700 mt-0.5">{person.position}</p>

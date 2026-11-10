@@ -1,8 +1,7 @@
-import Link from "next/link";
-import { LifeBuoy, AlertTriangle, Ambulance, ArrowRight, ArrowLeft, ShieldAlert, Activity } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { getStations, getUserStation } from "@/services/stations";
+import { getUserStation } from "@/services/stations";
 import { getCurrentProfile } from "@/services/auth";
+import BfpInteractiveView from "@/components/bfp/bfp-interactive-view";
 
 export default async function BFPCommandPage() {
   const profile = await getCurrentProfile();
@@ -24,36 +23,27 @@ export default async function BFPCommandPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Breadcrumb Navigation */}
-      <div>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Dashboard</span>
-        </Link>
-
-        {/* Page Banner Header */}
-        <div className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 text-white relative overflow-hidden shadow-lg">
-          <div className="absolute top-0 right-0 w-80 h-full bg-white/10 blur-[80px] pointer-events-none" />
-          <div className="relative space-y-2">
+      {/* Page Banner Header */}
+      <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+        <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-1.5 sm:space-y-2">
             <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-              <Logo size="sm" />
-              <span className="truncate max-w-[250px] sm:max-w-none">
+              <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+              <span>
                 {isAdmin
-                  ? "BFP REGIONAL OPERATIONAL MODULES"
+                  ? "BFP REGIONAL OPERATIONAL MODULES • SURIGAO DEL NORTE"
                   : userStation
                   ? `${userStation.name.toUpperCase()} • OPERATIONS`
                   : "BFP OPERATIONAL MODULES"}
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight break-words">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
               {isAdmin
                 ? "Bureau of Fire Protection Command Choices"
                 : "Station Operational Modules"}
             </h1>
-            <p className="text-xs sm:text-sm text-red-100 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
               {isAdmin
                 ? "Select an operational pillar below to review station-by-station readiness, incident reports, and tactical emergency deployments across Surigao del Norte."
                 : userStation
@@ -61,116 +51,22 @@ export default async function BFPCommandPage() {
                 : "Access RTR rescue operations, structural fire logs, and emergency medical services."}
             </p>
           </div>
+
+          <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
+            <span className="block text-lg sm:text-xl font-black text-white">3</span>
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Operational Pillars</span>
+          </div>
         </div>
       </div>
 
-      {/* 3 Prominent Choices: RTR, Fire Incident, EMS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-        {/* 1. RTR Choice */}
-        <Link
-          href={rtrHref}
-          className="group p-5 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:bg-zinc-50 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation min-h-[220px]"
-        >
-          <div>
-            <div className="flex items-start justify-between mb-4 sm:mb-6">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow shrink-0">
-                <LifeBuoy className="w-6 h-6 sm:w-7 sm:h-7" />
-              </div>
-              <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
-            </div>
-
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <span>SPECIAL RESCUE UNIT</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-black mb-1.5">
-              {!isAdmin && userStation ? "My Station RTR" : "RTR"}
-            </h2>
-            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2.5">
-              Rapid, Tactical, Response
-            </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mb-5">
-              Search and rescue operations, specialized typhoon flood interventions, high-angle rope rescue, and tactical emergency missions.
-            </p>
-          </div>
-
-          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
-            <span>
-              {!isAdmin && userStation ? "Open Station RTR Log" : "View Stations RTR"}
-            </span>
-            <span className="font-bold text-red-600 group-hover:underline">Explore &rarr;</span>
-          </div>
-        </Link>
-
-        {/* 2. Fire Incident Choice */}
-        <Link
-          href={fireHref}
-          className="group p-5 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:bg-zinc-50 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation min-h-[220px]"
-        >
-          <div>
-            <div className="flex items-start justify-between mb-4 sm:mb-6">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow shrink-0">
-                <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7" />
-              </div>
-              <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
-            </div>
-
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <span>FIRE SUPPRESSION</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-black mb-1.5">
-              {!isAdmin && userStation ? "My Fire Incidents" : "Fire Incident"}
-            </h2>
-            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2.5">
-              Alarms & Structural Reports
-            </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mb-5">
-              Active fire dispatches, multi-alarm level escalations, post-fire structural damage reports, and casualty logs.
-            </p>
-          </div>
-
-          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
-            <span>
-              {!isAdmin && userStation ? "Open Fire Incident Log" : "View Stations Incidents"}
-            </span>
-            <span className="font-bold text-red-600 group-hover:underline">Explore &rarr;</span>
-          </div>
-        </Link>
-
-        {/* 3. EMS Choice */}
-        <Link
-          href={emsHref}
-          className="group p-5 sm:p-8 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:bg-zinc-50 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between touch-manipulation min-h-[220px]"
-        >
-          <div>
-            <div className="flex items-start justify-between mb-4 sm:mb-6">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow shrink-0">
-                <Ambulance className="w-6 h-6 sm:w-7 sm:h-7" />
-              </div>
-              <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
-            </div>
-
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <span>MEDICAL RESPONSE</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-black mb-1.5">
-              {!isAdmin && userStation ? "My EMS Records" : "EMS"}
-            </h2>
-            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2.5">
-              Emergency Medical Services
-            </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mb-5">
-              Pre-hospital emergency care, paramedic triage, road trauma response, ambulance dispatches, and hospital patient transfers.
-            </p>
-          </div>
-
-          <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500">
-            <span>
-              {!isAdmin && userStation ? "Open Station EMS Log" : "View Stations EMS"}
-            </span>
-            <span className="font-bold text-red-600 group-hover:underline">Explore &rarr;</span>
-          </div>
-        </Link>
-      </div>
+      {/* Interactive Operational Modules: Grid or List */}
+      <BfpInteractiveView
+        isAdmin={isAdmin}
+        userStationName={userStation?.name}
+        rtrHref={rtrHref}
+        fireHref={fireHref}
+        emsHref={emsHref}
+      />
     </div>
   );
 }

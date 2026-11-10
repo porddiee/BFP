@@ -19,8 +19,10 @@ async function seed() {
   await supabase.from("stations").update({
     name: "BFP Surigao City Central Fire Station",
     address: "City Hall Compound, Parrucho Street, Barangay Washington, Surigao City, Surigao del Norte",
+    contact_number: "0931-721-8790 / 0926-226-0360",
     contact_number: "0931-721-8790",
     email: "surigaocityfirestation@yahoo.com",
+    district: "Surigao City Command • District 2",
     district: "Surigao City • Dist 2",
     is_active: true,
     approval_status: "approved"

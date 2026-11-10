@@ -1,8 +1,9 @@
 import { getStations, getUserStation } from "@/services/stations";
 import { getCurrentProfile } from "@/services/auth";
 import Link from "next/link";
-import { Building2, MapPin, Phone, ArrowRight, ArrowLeft, Users, Truck, CheckCircle2, Shield, PlusCircle } from "lucide-react";
+import { Building2, MapPin, Phone, ArrowRight, Users, Truck, CheckCircle2, Shield, PlusCircle } from "lucide-react";
 import CreateStationForm from "@/components/stations/create-station-form";
+import StationsInteractiveView from "@/components/stations/stations-interactive-view";
 
 export default async function StationsListPage() {
   const profile = await getCurrentProfile();
@@ -30,33 +31,33 @@ export default async function StationsListPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      {/* Header */}
-      <div>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Dashboard</span>
-        </Link>
-
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-              <Building2 className="w-3.5 h-3.5 shrink-0" />
-              <span>{isAdmin ? "REGIONAL STATION DIRECTORY" : "MY STATION COMMAND"}</span>
+      {/* Page Header Banner */}
+      <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+        <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+              <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+              <span>{isAdmin ? "REGIONAL STATION DIRECTORY • SURIGAO DEL NORTE" : "MY STATION COMMAND"}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
               {isAdmin ? "All Fire Stations" : userStation ? userStation.name : "Station Setup"}
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
               {isAdmin
-                ? `${stations.length} registered stations across Surigao del Norte`
+                ? `${stations.length} registered stations across Surigao del Norte. Review active rosters, equipment status, and station commands.`
                 : userStation
                 ? "Manage personnel roster, apparatus fleet, and operational services for your assigned station."
                 : "You do not have a registered fire station yet. Complete the form below to establish your station command."}
             </p>
           </div>
+
+          {isAdmin && (
+            <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
+              <span className="block text-lg sm:text-xl font-black text-white">{stations.length}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Stations Active</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -155,72 +156,9 @@ export default async function StationsListPage() {
         </>
       )}
 
-      {/* VIEW FOR REGIONAL ADMIN ONLY (All Stations) */}
+      {/* VIEW FOR REGIONAL ADMIN ONLY (All Stations with Grid / List Toggle) */}
       {isAdmin && (
-        <>
-          {stations.length === 0 ? (
-            <div className="text-center py-16 sm:py-20 bg-zinc-50 border border-zinc-200 rounded-2xl">
-              <Building2 className="w-10 h-10 sm:w-12 sm:h-12 text-zinc-300 mx-auto mb-4" />
-              <h2 className="text-base sm:text-lg font-bold text-black mb-1">No Stations Registered</h2>
-              <p className="text-[11px] sm:text-xs text-zinc-500">Stations will appear here once registered.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {stations.map((station) => (
-                <Link
-                  key={station.id}
-                  href={`/stations/${station.id}`}
-                  className="group p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 active:border-red-600 transition-all shadow-sm hover:shadow-md touch-manipulation flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-start justify-between mb-3 sm:mb-4">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">
-                          <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-pulse" />
-                          Active
-                        </span>
-                        {station.district && (
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate max-w-[140px]">
-                            {station.district}
-                          </span>
-                        )}
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all shrink-0 mt-0.5" />
-                    </div>
-
-                    <h3 className="text-base sm:text-lg font-bold text-black mb-2 sm:mb-3 break-words">{station.name}</h3>
-
-                    <div className="space-y-2 text-xs text-zinc-600 mb-4 sm:mb-5">
-                      {station.address && (
-                        <div className="flex items-start gap-2">
-                          <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
-                          <span className="break-words leading-relaxed">{station.address}</span>
-                        </div>
-                      )}
-                      {station.contact_number && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                          <span className="text-black font-semibold">{station.contact_number}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 sm:pt-4 border-t border-zinc-100 flex items-center gap-4 text-xs text-zinc-500 font-medium">
-                    <div className="flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                      <span>Personnel</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                      <span>Equipment</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </>
+        <StationsInteractiveView stations={stations} />
       )}
     </div>
   );

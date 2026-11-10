@@ -2,16 +2,10 @@ import { getCurrentProfile, getPendingProfiles } from "@/services/auth";
 import { getStations } from "@/services/stations";
 import Link from "next/link";
 import {
-  Building2,
   ShieldAlert,
-  ArrowRight,
-  Users,
-  Truck,
   AlertTriangle,
-  Ambulance,
-  LifeBuoy
 } from "lucide-react";
-import { Logo } from "@/components/logo";
+import DashboardCardsView from "@/components/dashboard/dashboard-cards-view";
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
@@ -53,9 +47,9 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-10">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome Banner */}
-      <div className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+      <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
         <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-1.5 sm:space-y-2">
@@ -70,7 +64,7 @@ export default async function DashboardPage() {
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
               Welcome back, {profile.first_name} {profile.last_name}
             </h1>
-            <p className="text-xs sm:text-sm text-red-100 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
               {isAdmin
                 ? "Manage fire stations across Surigao del Norte. Review personnel, equipment, and operational reports."
                 : "Your account is approved. Manage your station&apos;s personnel, equipment, and incident reports."}
@@ -91,75 +85,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* REGIONAL ADMIN VIEW */}
+      {/* REGIONAL ADMIN VIEW WITH GRID / LIST TOGGLE */}
       {isAdmin && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-          {/* STATIONS Card */}
-          <Link
-            href="/stations"
-            className="group p-5 sm:p-8 lg:p-10 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl"
-          >
-            <div className="flex items-start justify-between mb-4 sm:mb-6">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <Building2 className="w-6 h-6 sm:w-8 sm:h-8" />
-              </div>
-              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
-            </div>
-
-            <h2 className="text-xl sm:text-2xl font-black text-black mb-2">Stations</h2>
-            <p className="text-[11px] sm:text-sm text-zinc-600 leading-relaxed mb-4 sm:mb-6">
-              View all registered fire stations across Surigao del Norte. Access each station&apos;s personnel roster and available equipment &amp; services.
-            </p>
-
-            <div className="flex items-center gap-4 sm:gap-6 pt-3 sm:pt-4 border-t border-zinc-100 flex-wrap">
-              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
-                <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
-                <span><strong className="text-black">{stationsCount}</strong> Active Stations</span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
-                <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
-                <span>Personnel</span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
-                <Truck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
-                <span>Equipment</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* BFP Card */}
-          <Link
-            href="/bfp"
-            className="group p-5 sm:p-8 lg:p-10 rounded-2xl bg-white border-2 border-zinc-200 hover:border-red-600 transition-all shadow-sm hover:shadow-xl"
-          >
-            <div className="flex items-start justify-between mb-4 sm:mb-6">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors red-glow">
-                <Logo size="lg" />
-              </div>
-              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-300 group-hover:text-red-600 group-hover:translate-x-1 transition-all mt-2" />
-            </div>
-
-            <h2 className="text-xl sm:text-2xl font-black text-black mb-2">BFP</h2>
-            <p className="text-[11px] sm:text-sm text-zinc-600 leading-relaxed mb-4 sm:mb-6">
-              Bureau of Fire Protection operational modules. Access RTR rescue operations, fire incident reports, and emergency medical services across all stations.
-            </p>
-
-            <div className="flex items-center gap-4 sm:gap-6 pt-3 sm:pt-4 border-t border-zinc-100 flex-wrap">
-              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
-                <LifeBuoy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
-                <span>RTR</span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
-                <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
-                <span>Fire Incidents</span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-500">
-                <Ambulance className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600" />
-                <span>EMS</span>
-              </div>
-            </div>
-          </Link>
-        </div>
+        <DashboardCardsView stationsCount={stationsCount} />
       )}
 
       {/* STATION USER VIEW */}

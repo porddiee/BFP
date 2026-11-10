@@ -1,7 +1,6 @@
 import { getPendingProfiles, getCurrentProfile } from "@/services/auth";
 import RegistrationApprovalList from "@/components/admin/registration-approval-list";
-import Link from "next/link";
-import { ArrowLeft, ShieldAlert, Building2 } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export default async function RegistrationsPage() {
@@ -46,39 +45,27 @@ export default async function RegistrationsPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Breadcrumb */}
-      <div>
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1.5 py-1 text-xs text-zinc-500 hover:text-black font-semibold transition-colors mb-3 sm:mb-4 touch-manipulation"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Dashboard</span>
-        </Link>
+    <div className="space-y-6 sm:space-y-8">
+      {/* Page Header Banner */}
+      <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 relative overflow-hidden shadow-lg">
+        <div className="absolute top-0 right-0 w-40 sm:w-80 h-full bg-white/10 blur-[50px] sm:blur-[80px] pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+              <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
+              <span>REGIONAL COMMAND AUTHORITY • SURIGAO DEL NORTE</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
+              Station Member Registrations
+            </h1>
+            <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
+              Every station officer registering on the portal requires Regional Admin verification before accessing emergency rosters.
+            </p>
+          </div>
 
-        {/* Page Header */}
-        <div className="p-4 sm:p-6 rounded-2xl bg-white border-2 border-zinc-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0 red-glow">
-              <ShieldAlert className="w-6 h-6 sm:w-7 sm:h-7" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                  Regional Command Authority
-                </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                  {displayProfiles.length} Awaiting Review
-                </span>
-              </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-black tracking-tight break-words">
-                Station Member Registrations
-              </h1>
-              <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
-                Every station officer registering on the portal requires Regional Admin verification before accessing emergency rosters.
-              </p>
-            </div>
+          <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
+            <span className="block text-lg sm:text-xl font-black text-white">{displayProfiles.length}</span>
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Awaiting Review</span>
           </div>
         </div>
       </div>

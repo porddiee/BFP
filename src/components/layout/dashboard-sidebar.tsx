@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   Users,
-  Truck
+  Truck,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { logoutAction } from "@/app/actions/auth";
@@ -87,16 +88,18 @@ export default function DashboardSidebar({
         desc: "Regional directory",
       },
       {
+        name: "Administrative Updates",
+        href: "/administrative-updates",
+        icon: FileSpreadsheet,
+        active: pathname.startsWith("/administrative-updates"),
+        desc: "Stations & fleet matrix",
+      },
+      {
         name: "BFP Operations",
         href: "/bfp",
         icon: AlertTriangle,
         active: pathname.startsWith("/bfp"),
         desc: "RTR, Fire & EMS",
-        subItems: [
-          { name: "RTR Rescue", href: "/bfp/rtr", icon: LifeBuoy, active: pathname.startsWith("/bfp/rtr") },
-          { name: "Fire Incidents", href: "/bfp/fire-incidents", icon: AlertTriangle, active: pathname.startsWith("/bfp/fire-incidents") },
-          { name: "EMS Services", href: "/bfp/ems", icon: Ambulance, active: pathname.startsWith("/bfp/ems") },
-        ],
       },
       {
         name: "Approvals",
@@ -148,11 +151,13 @@ export default function DashboardSidebar({
           icon: AlertTriangle,
           active: pathname.startsWith("/bfp"),
           desc: "My Operational Logs",
-          subItems: [
-            { name: "My RTR Rescue", href: `/bfp/rtr/${userStationId}`, icon: LifeBuoy, active: pathname.includes(`/bfp/rtr/${userStationId}`) },
-            { name: "My Fire Incidents", href: `/bfp/fire-incidents/${userStationId}`, icon: AlertTriangle, active: pathname.includes(`/bfp/fire-incidents/${userStationId}`) },
-            { name: "My EMS Records", href: `/bfp/ems/${userStationId}`, icon: Ambulance, active: pathname.includes(`/bfp/ems/${userStationId}`) },
-          ],
+        },
+        {
+          name: "Administrative Updates",
+          href: "/administrative-updates",
+          icon: FileSpreadsheet,
+          active: pathname.startsWith("/administrative-updates"),
+          desc: "Stations & fleet matrix",
         }
       );
     }
