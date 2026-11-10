@@ -68,19 +68,46 @@ export default async function StationPersonnelPage({
   // Pure database personnel records for this station
   const finalRoster = members.map((m: any, idx: number) => {
     const firstName = m.profiles?.first_name || "";
+    const lastName = m.profiles?.last_name || "";
     const gender = detectGender(firstName);
+
+    let position = m.position || "Firefighter / EMS";
+    let shift = idx % 2 === 0 ? "Shift Alpha (08:00 - 20:00)" : "Shift Bravo (20:00 - 08:00)";
+    let status: "on_duty" | "off_duty" = idx % 2 === 0 ? "on_duty" : "off_duty";
+
+    if (m.position && m.position.includes(" • Shift ")) {
+      const parts = m.position.split(" • Shift ");
+      position = parts[0];
+      shift = "Shift " + parts[1];
+    } else if (m.position && m.position.includes(" • ")) {
+      const parts = m.position.split(" • ");
+      position = parts[0];
+      shift = parts[1];
+    }
+
+    if (shift.toLowerCase().includes("off")) {
+      status = "off_duty";
+    } else if (shift.toLowerCase().includes("alpha") || shift.toLowerCase().includes("day")) {
+      status = "on_duty";
+    } else if (shift.toLowerCase().includes("bravo") || shift.toLowerCase().includes("night")) {
+      status = "on_duty";
+    }
+
     return {
       id: m.id,
+      profileId: m.profiles?.id || m.profile_id,
+      firstName,
+      lastName,
       name: m.profiles ? `${m.profiles.first_name} ${m.profiles.last_name}` : `Officer #${idx + 1}`,
       rank: m.rank || "Fire Officer 1",
-      position: m.position || "Firefighter / EMS",
-      status: idx % 2 === 0 ? ("on_duty" as const) : ("off_duty" as const),
+      position,
+      status,
       gender: gender as ("male" | "female"),
-      shift: idx % 2 === 0 ? "Shift Alpha (08:00 - 20:00)" : "Shift Bravo (20:00 - 08:00)",
+      shift,
       contact: m.profiles?.contact_number || "Not listed",
       email: m.profiles?.email || "officer@bfp.gov.ph",
       badgeNo: `BFP-SRG-${1000 + idx}`,
-      specialization: m.position || "General Fire & Rescue Operations",
+      specialization: position,
     };
   });
 
@@ -147,7 +174,7 @@ export default async function StationPersonnelPage({
 
       {/* Weekly Duty Detail Section */}
       {finalRoster.length > 0 && (
-        <WeeklyDutyDetail roster={finalRoster} stationName={station.name} />
+        <WeeklyDutyDetail roster={finalRoster} stationName={station.name} stationId={stationId} isOwner={isOwner} />
       )}
 
       {/* Interactive Personnel Roster or Empty State */}
@@ -164,7 +191,7 @@ export default async function StationPersonnelPage({
           </p>
         </div>
       ) : (
-        <PersonnelRosterView roster={finalRoster} />
+        <PersonnelRosterView roster={finalRoster} stationId={stationId} isOwner={isOwner} />
       )}
     </div>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Ambulance, Activity, CheckCircle2, Clock, MapPin, ShieldAlert, HeartPulse, User, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import AddEMSIncidentModal from "@/components/incidents/add-ems-incident-modal";
+import IncidentListView from "@/components/incidents/incident-list-view";
 
 export default async function StationEMSDetailPage({
   params,
@@ -91,7 +92,7 @@ export default async function StationEMSDetailPage({
       </div>
     </div>
 
-      {/* EMS Dispatches List or Zero-State */}
+      {/* EMS Dispatches List or Zero-State with interactive resolution & delete */}
       {dbIncidents.length === 0 ? (
         <div className="p-12 text-center bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-2xl space-y-3">
           <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-400 mx-auto">
@@ -105,58 +106,7 @@ export default async function StationEMSDetailPage({
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-black text-black">Pre-Hospital Patient Care Records</h2>
-            <p className="text-xs text-zinc-500">Official emergency medical run sheets logged by certified station EMTs.</p>
-          </div>
-
-          {dbIncidents.map((log) => (
-            <div
-              key={log.id}
-              className="p-6 rounded-2xl bg-white border-2 border-zinc-200 hover:border-zinc-300 transition-all shadow-sm space-y-4"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="px-2.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-200 text-xs font-mono font-bold">
-                    {log.id.substring(0, 8)}
-                  </span>
-                  <h3 className="text-base font-black text-black">{log.incident_type}</h3>
-                </div>
-
-                <div className="flex items-center gap-2 self-start sm:self-auto">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase">
-                    {log.severity || "Emergency"}
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">
-                    <CheckCircle2 className="w-3 h-3" />
-                    {log.status || "Active"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-zinc-600 pt-3 border-t border-zinc-100">
-                <div>
-                  <span className="text-zinc-400 block text-[10px] uppercase font-bold">Location</span>
-                  <span className="font-semibold text-black">{log.location}</span>
-                </div>
-                <div>
-                  <span className="text-zinc-400 block text-[10px] uppercase font-bold">Dispatch Timestamp</span>
-                  <span className="font-semibold text-black">
-                    {new Date(log.reported_at || log.created_at).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {log.description && (
-                <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-700 space-y-1">
-                  <span className="text-zinc-400 block text-[10px] uppercase font-bold">Clinical Notes & Actions Taken</span>
-                  <p className="leading-relaxed">{log.description}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <IncidentListView stationId={stationId} isOwner={isOwner} type="ems" incidents={dbIncidents} />
       )}
     </div>
   );

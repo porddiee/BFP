@@ -15,8 +15,6 @@ import {
   PinOff,
   Menu,
   X,
-  Users,
-  Truck,
   FileSpreadsheet,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
@@ -126,41 +124,22 @@ export default function DashboardSidebar({
         icon: Building2,
         active: pathname === "/stations" || (!!userStationId && pathname === `/stations/${userStationId}`),
         desc: userStationName ? "Active Command Unit" : "Register / View Station",
+      },
+      {
+        name: "Administrative Updates",
+        href: "/administrative-updates",
+        icon: FileSpreadsheet,
+        active: pathname.startsWith("/administrative-updates"),
+        desc: "Stations & fleet matrix",
+      },
+      {
+        name: "BFP Operations",
+        href: "/bfp",
+        icon: AlertTriangle,
+        active: pathname.startsWith("/bfp"),
+        desc: "My Operational Logs",
       }
     );
-
-    if (userStationId) {
-      navItems.push(
-        {
-          name: "Personnel",
-          href: `/stations/${userStationId}/personnel`,
-          icon: Users,
-          active: pathname.includes(`/stations/${userStationId}/personnel`),
-          desc: "On/Off Duty Roster",
-        },
-        {
-          name: "Equipment & PPEs",
-          href: `/stations/${userStationId}/equipment`,
-          icon: Truck,
-          active: pathname.includes(`/stations/${userStationId}/equipment`),
-          desc: "Firetrucks & Gear",
-        },
-        {
-          name: "BFP Operations",
-          href: "/bfp",
-          icon: AlertTriangle,
-          active: pathname.startsWith("/bfp"),
-          desc: "My Operational Logs",
-        },
-        {
-          name: "Administrative Updates",
-          href: "/administrative-updates",
-          icon: FileSpreadsheet,
-          active: pathname.startsWith("/administrative-updates"),
-          desc: "Stations & fleet matrix",
-        }
-      );
-    }
   }
 
   return (
