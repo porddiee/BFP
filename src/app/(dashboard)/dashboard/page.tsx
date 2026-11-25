@@ -1,11 +1,16 @@
 import { getCurrentProfile, getPendingProfiles } from "@/services/auth";
-import { getStations } from "@/services/stations";
+import { getStations, getUserStation } from "@/services/stations";
+import { getDashboardData } from "@/services/dashboard";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShieldAlert,
   AlertTriangle,
 } from "lucide-react";
 import DashboardCardsView from "@/components/dashboard/dashboard-cards-view";
+import QuickActionsPanel from "@/components/dashboard/quick-actions-panel";
+import RealTimeActivityFeed from "@/components/dashboard/real-time-activity-feed";
+import StationPerformanceMetrics from "@/components/dashboard/station-performance-metrics";
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
@@ -32,19 +37,36 @@ export default async function DashboardPage() {
   }
 
   const isAdmin = profile.role === "admin";
-  let stationsCount = 0;
   let pendingCount = 0;
+  let userStation = null;
 
   if (isAdmin) {
     try {
-      const stations = await getStations();
-      stationsCount = stations.length;
       const pending = await getPendingProfiles();
       pendingCount = pending.length;
     } catch (e) {
-      console.error("Admin dashboard fetch error:", e);
+      console.error("Admin dashboard pending count error:", e);
+    }
+  } else {
+    try {
+      userStation = await getUserStation(profile.id);
+    } catch (e) {
+      console.error("Error fetching user station:", e);
     }
   }
+
+  // Fetch comprehensive consolidated dashboard data (activities, performance, metrics)
+  const { summaryMetrics, activities, performanceMetrics, stations } =
+    await getDashboardData();
+
+  const stationsCount = summaryMetrics.totalStations;
+
+  // Format station options for Quick Actions selector (admin use)
+  const stationOptions = stations.map((s) => ({
+    id: s.id,
+    stationName: s.stationName,
+    district: s.district,
+  }));
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -57,7 +79,9 @@ export default async function DashboardPage() {
               <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
               <span>
                 {isAdmin
-                  ? "REGIONAL ADMIN • SURIGAO DEL NORTE"
+                  ? "PROVINCIAL ADMIN • SURIGAO DEL NORTE"
+                  : userStation
+                  ? `STATION OFFICER • ${userStation.name.toUpperCase()}`
                   : "STATION OFFICER PORTAL"}
               </span>
             </div>
@@ -66,39 +90,59 @@ export default async function DashboardPage() {
             </h1>
             <p className="text-xs sm:text-sm text-red-100 max-w-3xl leading-relaxed mt-1 sm:mt-1.5">
               {isAdmin
-                ? "Manage fire stations across Surigao del Norte. Review personnel, equipment, and operational reports."
-                : "Your account is approved. Manage your station&apos;s personnel, equipment, and incident reports."}
+                ? "Manage fire stations across Surigao del Norte. Review personnel, equipment, real-time activity, and operational performance."
+                : userStation
+                ? `Manage operations for ${userStation.name}. Track personnel, equipment, incidents, and duty schedules.`
+                : "Manage your station operations. Track personnel, equipment, incidents, and duty schedules."}
             </p>
           </div>
 
-          {isAdmin && pendingCount > 0 && (
-            <div className="flex pt-1 sm:pt-0">
-              <Link
-                href="/admin/registrations"
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 active:bg-zinc-100 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md shrink-0 touch-manipulation min-h-[44px]"
-              >
-                <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span>Pending Users ({pendingCount})</span>
-              </Link>
+          {/* Rotating Surigao del Norte Seal Logo - Moved to Right */}
+          <div className="relative shrink-0 flex items-center justify-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full p-1 bg-white/10 backdrop-blur-sm border border-white/20 shadow-md flex items-center justify-center overflow-hidden">
+              <Image
+                src="/images/Surigao del Norte Fire Protection Seal.png"
+                alt="Surigao del Norte Fire Protection Seal"
+                width={96}
+                height={96}
+                className="w-full h-full object-contain animate-spin-slow drop-shadow-md select-none pointer-events-none"
+                priority
+              />
             </div>
-          )}
+          </div>
         </div>
+
+        {isAdmin && pendingCount > 0 && (
+          <div className="flex pt-1 sm:pt-0">
+            <Link
+              href="/admin/registrations"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white text-red-600 hover:bg-red-50 active:bg-zinc-100 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md shrink-0 touch-manipulation min-h-[44px]"
+            >
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span>Pending Users ({pendingCount})</span>
+            </Link>
+          </div>
+        )}
       </div>
 
-      {/* REGIONAL ADMIN VIEW WITH GRID / LIST TOGGLE */}
-      {isAdmin && (
-        <DashboardCardsView stationsCount={stationsCount} />
-      )}
+      {/* 1. Quick Actions Panel: Role-tailored (admin vs station user) */}
+      <QuickActionsPanel
+        isAdmin={isAdmin}
+        userStationId={userStation?.id}
+        stations={stationOptions}
+      />
 
-      {/* STATION USER VIEW */}
-      {!isAdmin && (
-        <div className="p-4 sm:p-6 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-900 max-w-2xl mx-auto space-y-2">
-          <span className="font-bold text-xs sm:text-sm block">Coming Soon in Phase 2</span>
-          <p className="text-[11px] sm:text-xs leading-relaxed">
-            Station user features will be available in Phase 2. Currently, please use the admin account to manage stations and personnel.
-          </p>
+      {/* 2. Command Center Modules with Grid / List Layout Toggle */}
+      <DashboardCardsView stationsCount={stationsCount} />
+
+      {/* 3. Operations Section: Role-tailored layout */}
+      {isAdmin ? (
+        /* Admin side: Side-by-side Real-Time Activity Feed & Station Performance Metrics */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <RealTimeActivityFeed initialActivities={activities} />
+          <StationPerformanceMetrics metrics={performanceMetrics} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

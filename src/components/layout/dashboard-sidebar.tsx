@@ -65,25 +65,25 @@ export default function DashboardSidebar({
     setMobileOpen(false);
   }, [pathname]);
 
-  // Build navigation items dynamically based on role (Regional Admin vs Station User)
+  // Build navigation items dynamically based on role (Provincial Admin vs Station User)
   const navItems = [];
 
   if (isAdmin) {
-    // REGIONAL ADMIN NAVIGATION
+    // PROVINCIAL ADMIN NAVIGATION
     navItems.push(
       {
         name: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
         active: pathname === "/dashboard",
-        desc: "Regional overview",
+        desc: "Provincial overview",
       },
       {
         name: "All Stations",
         href: "/stations",
         icon: Building2,
         active: pathname.startsWith("/stations"),
-        desc: "Regional directory",
+        desc: "Provincial directory",
       },
       {
         name: "Administrative Updates",
@@ -100,7 +100,7 @@ export default function DashboardSidebar({
         desc: "RTR, Fire & EMS",
       },
       {
-        name: "Approvals",
+        name: "Station Approval",
         href: "/admin/registrations",
         icon: ShieldAlert,
         active: pathname.startsWith("/admin/registrations"),
@@ -145,20 +145,20 @@ export default function DashboardSidebar({
   return (
     <>
       {/* Mobile Menu Top Bar */}
-      <div className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between shadow-sm">
+      <div className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between shadow-sm print:hidden">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center text-white red-glow shadow-sm shrink-0">
             <Logo size="sm" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-black text-sm text-black tracking-wide">BFP SURIGAO</span>
+              <span className="font-black text-sm text-black tracking-wide">BFP SDN PHQ</span>
               <span className="bg-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded text-white tracking-wider uppercase">
                 {isAdmin ? "ADMIN" : "STATION"}
               </span>
             </div>
             <span className="text-[10px] text-zinc-500 block leading-tight font-semibold">
-              {isAdmin ? "Regional Command" : userStationName || "Station Portal"}
+              {isAdmin ? "Provincial Command" : userStationName || "Station Portal"}
             </span>
           </div>
         </Link>
@@ -176,7 +176,7 @@ export default function DashboardSidebar({
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity print:hidden"
           aria-hidden="true"
         />
       )}
@@ -185,7 +185,7 @@ export default function DashboardSidebar({
       <aside
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`fixed top-0 left-0 bottom-0 z-50 bg-white border-r border-zinc-200 shadow-xl flex flex-col justify-between transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 bottom-0 z-50 bg-white border-r border-zinc-200 shadow-xl flex flex-col justify-between transition-all duration-300 ease-in-out print:hidden ${
           isPinned ? "lg:w-64" : isExpanded ? "lg:w-64 lg:shadow-2xl" : "lg:w-[72px]"
         } ${
           mobileOpen ? "translate-x-0 w-[290px] sm:w-80" : "-translate-x-full lg:translate-x-0"
@@ -209,13 +209,13 @@ export default function DashboardSidebar({
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="font-black text-sm tracking-wider text-black">BFP SURIGAO</span>
+                  <span className="font-black text-sm tracking-wider text-black">BFP SDN PHQ</span>
                   <span className="bg-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded text-white tracking-widest uppercase">
                     {isAdmin ? "ADMIN" : "STATION"}
                   </span>
                 </div>
                 <span className="text-[10px] text-zinc-500 font-semibold block truncate max-w-[150px]">
-                  {isAdmin ? "Regional Command" : userStationName || "Station Command"}
+                  {isAdmin ? "Provincial Command" : userStationName || "Station Command"}
                 </span>
               </div>
             </Link>
@@ -335,7 +335,7 @@ export default function DashboardSidebar({
                   {profile.first_name} {profile.last_name}
                 </span>
                 <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider block">
-                  {isAdmin ? "Regional Admin" : "Station Officer"}
+                  {isAdmin ? "Provincial Admin" : "Station Officer"}
                 </span>
               </div>
             </div>

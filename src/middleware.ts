@@ -73,9 +73,11 @@ export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const isProtectedRoute =
       pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/admin") ||
+      pathname === "/admin" ||
+      pathname.startsWith("/admin/") ||
       pathname.startsWith("/bfp") ||
-      pathname.startsWith("/stations");
+      pathname.startsWith("/stations") ||
+      pathname.startsWith("/administrative-updates");
 
     // Protect internal routes - user must be authenticated
     if (isProtectedRoute && !user) {
@@ -89,8 +91,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/pending-approval", request.url));
       }
 
-      // Role check: Admin routes require admin role
-      if (pathname.startsWith("/admin") && profile.role !== "admin") {
+      // Role check: Admin routes require admin role (e.g. /admin/registrations, /admin)
+      // Note: Must not match /administrative-updates which is accessible to all station users
+      if ((pathname === "/admin" || pathname.startsWith("/admin/")) && profile.role !== "admin") {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
     }

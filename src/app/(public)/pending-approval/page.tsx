@@ -25,7 +25,7 @@ export default function PendingApprovalPage() {
               Registration Submitted
             </h1>
             <p className="mt-1.5 text-xs sm:text-sm text-zinc-600 max-w-md mx-auto leading-relaxed">
-              Your station account credentials have been logged in the BFP Surigao database and are currently awaiting review by the Regional Administrator.
+              Your station account credentials have been logged in the BFP Surigao database and are currently awaiting review by the Provincial Administrator.
             </p>
           </div>
         </div>
@@ -54,9 +54,9 @@ export default function PendingApprovalPage() {
                 <Clock className="w-4 h-4 animate-spin" />
               </div>
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-amber-800 block">Regional Administrator Review</span>
+                <span className="text-xs font-bold text-amber-800 block">Provincial Administrator Review</span>
                 <p className="text-[11px] text-zinc-600">
-                  Regional Command is verifying your station assignment and authorization clearance.
+                  Provincial Command is verifying your station assignment and authorization clearance.
                 </p>
               </div>
             </div>
@@ -77,7 +77,7 @@ export default function PendingApprovalPage() {
           <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 space-y-2">
             <span className="font-bold text-black block">Need Expedited Approval?</span>
             <p className="text-[11px] leading-relaxed">
-              If you require immediate operational clearance during active duty, contact the Regional Dispatch Command Desk directly:
+              If you require immediate operational clearance during active duty, contact the Provincial Dispatch Command Desk directly:
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1 text-xs">
               <div className="flex items-center gap-1.5 font-bold text-red-600">

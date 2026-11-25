@@ -6,6 +6,7 @@ import { ArrowLeft, Truck, Shield, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import AddEquipmentModal from "@/components/stations/add-equipment-modal";
 import EquipmentRosterView from "@/components/stations/equipment-roster-view";
+import { RotatingSeal } from "@/components/layout/rotating-seal";
 
 export default async function StationEquipmentPage({
   params,
@@ -90,7 +91,8 @@ export default async function StationEquipmentPage({
 
             {/* Quick Metrics & Add Action */}
             <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 flex-1 sm:flex-initial">
+              <RotatingSeal />
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 flex-1 sm:flex-initial">
               <div className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
                 <span className="block text-lg sm:text-xl font-black text-white">{apparatusList.length}</span>
                 <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Apparatus</span>
@@ -107,7 +109,7 @@ export default async function StationEquipmentPage({
             ) : isAdmin ? (
               <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center flex items-center justify-center gap-1.5 text-white/80">
                 <Lock className="w-3.5 h-3.5 shrink-0" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Regional Oversight (Read-Only)</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Provincial Oversight (Read-Only)</span>
               </div>
             ) : null}
           </div>

@@ -2,6 +2,7 @@ import { Logo } from "@/components/logo";
 import { getUserStation } from "@/services/stations";
 import { getCurrentProfile } from "@/services/auth";
 import BfpInteractiveView from "@/components/bfp/bfp-interactive-view";
+import { RotatingSeal } from "@/components/layout/rotating-seal";
 
 export default async function BFPCommandPage() {
   const profile = await getCurrentProfile();
@@ -16,7 +17,7 @@ export default async function BFPCommandPage() {
     }
   }
 
-  // Dynamic links: station users go straight to their station modules, admins go to regional list
+  // Dynamic links: station users go straight to their station modules, admins go to provincial list
   const rtrHref = !isAdmin && userStation ? `/bfp/rtr/${userStation.id}` : "/bfp/rtr";
   const fireHref = !isAdmin && userStation ? `/bfp/fire-incidents/${userStation.id}` : "/bfp/fire-incidents";
   const emsHref = !isAdmin && userStation ? `/bfp/ems/${userStation.id}` : "/bfp/ems";
@@ -32,7 +33,7 @@ export default async function BFPCommandPage() {
               <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
               <span>
                 {isAdmin
-                  ? "BFP REGIONAL OPERATIONAL MODULES • SURIGAO DEL NORTE"
+                  ? "BFP PROVINCIAL OPERATIONAL MODULES • SURIGAO DEL NORTE"
                   : userStation
                   ? `${userStation.name.toUpperCase()} • OPERATIONS`
                   : "BFP OPERATIONAL MODULES"}
@@ -52,9 +53,12 @@ export default async function BFPCommandPage() {
             </p>
           </div>
 
-          <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
-            <span className="block text-lg sm:text-xl font-black text-white">3</span>
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Operational Pillars</span>
+          <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+            <RotatingSeal />
+            <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
+              <span className="block text-lg sm:text-xl font-black text-white">3</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Operational Pillars</span>
+            </div>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Building2, MapPin, Phone, ArrowRight, Users, Truck, CheckCircle2, Shield, PlusCircle } from "lucide-react";
 import CreateStationForm from "@/components/stations/create-station-form";
 import StationsInteractiveView from "@/components/stations/stations-interactive-view";
+import { RotatingSeal } from "@/components/layout/rotating-seal";
 
 export default async function StationsListPage() {
   const profile = await getCurrentProfile();
@@ -19,7 +20,7 @@ export default async function StationsListPage() {
     }
   }
 
-  // For Regional Admins: fetch all stations across Surigao
+  // For Provincial Admins: fetch all stations across Surigao
   let stations: Awaited<ReturnType<typeof getStations>> = [];
   if (isAdmin) {
     try {
@@ -38,7 +39,7 @@ export default async function StationsListPage() {
           <div className="space-y-1.5 sm:space-y-2">
             <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider">
               <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-white animate-pulse" />
-              <span>{isAdmin ? "REGIONAL STATION DIRECTORY • SURIGAO DEL NORTE" : "MY STATION COMMAND"}</span>
+              <span>{isAdmin ? "PROVINCIAL STATION DIRECTORY • SURIGAO DEL NORTE" : "MY STATION COMMAND"}</span>
             </div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight break-words">
               {isAdmin ? "All Fire Stations" : userStation ? userStation.name : "Station Setup"}
@@ -52,12 +53,15 @@ export default async function StationsListPage() {
             </p>
           </div>
 
-          {isAdmin && (
-            <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
-              <span className="block text-lg sm:text-xl font-black text-white">{stations.length}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Stations Active</span>
-            </div>
-          )}
+          <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
+            <RotatingSeal />
+            {isAdmin && (
+              <div className="relative px-4 py-2 sm:py-2.5 rounded-xl bg-white/10 border border-white/20 text-center shrink-0 w-full sm:w-auto">
+                <span className="block text-lg sm:text-xl font-black text-white">{stations.length}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Stations Active</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -156,7 +160,7 @@ export default async function StationsListPage() {
         </>
       )}
 
-      {/* VIEW FOR REGIONAL ADMIN ONLY (All Stations with Grid / List Toggle) */}
+      {/* VIEW FOR PROVINCIAL ADMIN ONLY (All Stations with Grid / List Toggle) */}
       {isAdmin && (
         <StationsInteractiveView stations={stations} />
       )}

@@ -13,8 +13,6 @@ import {
   RotateCcw,
   Save,
   Loader2,
-  Sun,
-  Moon,
   Coffee,
   CalendarDays,
   UserCheck,
@@ -47,7 +45,7 @@ interface WeeklyDutyDetailProps {
   isOwner?: boolean;
 }
 
-type ShiftType = "alpha" | "bravo" | "off";
+type ShiftType = "on_duty" | "off_duty";
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 type DayName = typeof DAYS[number];
 
@@ -63,7 +61,7 @@ export default function WeeklyDutyDetail({
     const d = new Date().getDay();
     return d === 0 ? 6 : d - 1;
   });
-  const [dailyFilter, setDailyFilter] = useState<"all" | "alpha" | "bravo" | "off">("all");
+  const [dailyFilter, setDailyFilter] = useState<"all" | "on_duty" | "off_duty">("all");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -91,13 +89,13 @@ export default function WeeklyDutyDetail({
     const initial: Record<string, Record<DayName, ShiftType>> = {};
     roster.forEach((p, pIdx) => {
       initial[p.id] = {
-        Monday: pIdx % 2 === 0 ? "alpha" : "bravo",
-        Tuesday: pIdx % 2 === 0 ? "alpha" : "bravo",
-        Wednesday: pIdx % 2 === 0 ? "bravo" : "alpha",
-        Thursday: pIdx % 2 === 0 ? "bravo" : "alpha",
-        Friday: pIdx % 2 === 0 ? "alpha" : "off",
-        Saturday: pIdx % 2 === 0 ? "off" : "bravo",
-        Sunday: pIdx % 2 === 0 ? "bravo" : "alpha",
+        Monday: pIdx % 2 === 0 ? "on_duty" : "on_duty",
+        Tuesday: pIdx % 2 === 0 ? "on_duty" : "on_duty",
+        Wednesday: pIdx % 2 === 0 ? "on_duty" : "on_duty",
+        Thursday: pIdx % 2 === 0 ? "on_duty" : "on_duty",
+        Friday: pIdx % 2 === 0 ? "on_duty" : "off_duty",
+        Saturday: pIdx % 2 === 0 ? "off_duty" : "on_duty",
+        Sunday: pIdx % 2 === 0 ? "on_duty" : "on_duty",
       };
     });
     return initial;
@@ -107,9 +105,9 @@ export default function WeeklyDutyDetail({
   const cycleShift = (personId: string, day: DayName) => {
     if (!isOwner) return;
     setSchedule((prev) => {
-      const currentShift = prev[personId]?.[day] || "alpha";
+      const currentShift = prev[personId]?.[day] || "on_duty";
       const nextShift: ShiftType =
-        currentShift === "alpha" ? "bravo" : currentShift === "bravo" ? "off" : "alpha";
+        currentShift === "on_duty" ? "off_duty" : "on_duty";
       return {
         ...prev,
         [personId]: {
@@ -129,13 +127,13 @@ export default function WeeklyDutyDetail({
       roster.forEach((p, idx) => {
         const cur = prev[p.id] || {};
         updated[p.id] = {
-          Monday: cur.Monday === "alpha" ? "bravo" : "alpha",
-          Tuesday: cur.Tuesday === "alpha" ? "bravo" : "alpha",
-          Wednesday: cur.Wednesday === "alpha" ? "bravo" : "alpha",
-          Thursday: cur.Thursday === "alpha" ? "bravo" : "alpha",
-          Friday: cur.Friday === "off" ? "alpha" : "off",
-          Saturday: cur.Saturday === "off" ? "bravo" : "off",
-          Sunday: cur.Sunday === "alpha" ? "bravo" : "alpha",
+          Monday: cur.Monday === "on_duty" ? "off_duty" : "on_duty",
+          Tuesday: cur.Tuesday === "on_duty" ? "off_duty" : "on_duty",
+          Wednesday: cur.Wednesday === "on_duty" ? "off_duty" : "on_duty",
+          Thursday: cur.Thursday === "on_duty" ? "off_duty" : "on_duty",
+          Friday: cur.Friday === "off_duty" ? "on_duty" : "off_duty",
+          Saturday: cur.Saturday === "off_duty" ? "on_duty" : "off_duty",
+          Sunday: cur.Sunday === "on_duty" ? "off_duty" : "on_duty",
         };
       });
       return updated;
@@ -175,7 +173,7 @@ export default function WeeklyDutyDetail({
 
   const dailyRoster = useMemo(() => {
     return roster.map((p) => {
-      const assignedShift = schedule[p.id]?.[selectedDay] || (p.status === "on_duty" ? "alpha" : "bravo");
+      const assignedShift = schedule[p.id]?.[selectedDay] || (p.status === "on_duty" ? "on_duty" : "off_duty");
       return {
         ...p,
         dayShift: assignedShift,
@@ -183,13 +181,12 @@ export default function WeeklyDutyDetail({
     });
   }, [roster, schedule, selectedDay]);
 
-  const dailyAlphaCrew = dailyRoster.filter((p) => p.dayShift === "alpha");
-  const dailyBravoCrew = dailyRoster.filter((p) => p.dayShift === "bravo");
-  const dailyOffDutyCrew = dailyRoster.filter((p) => p.dayShift === "off");
+  const dailyOnDutyCrew = dailyRoster.filter((p) => p.dayShift === "on_duty");
+  const dailyOffDutyCrew = dailyRoster.filter((p) => p.dayShift === "off_duty");
 
-  const dailyActiveDutyCount = dailyAlphaCrew.length + dailyBravoCrew.length;
-  const dailyActiveMale = dailyRoster.filter((p) => p.dayShift !== "off" && p.gender === "male").length;
-  const dailyActiveFemale = dailyRoster.filter((p) => p.dayShift !== "off" && p.gender === "female").length;
+  const dailyActiveDutyCount = dailyOnDutyCrew.length;
+  const dailyActiveMale = dailyRoster.filter((p) => p.dayShift === "on_duty" && p.gender === "male").length;
+  const dailyActiveFemale = dailyRoster.filter((p) => p.dayShift === "on_duty" && p.gender === "female").length;
 
   const currentWeekString = `${weekDates[0].dateStr} – ${weekDates[6].fullDateStr}`;
 
@@ -206,7 +203,7 @@ export default function WeeklyDutyDetail({
             Station Duty Scheduling & Demographics
           </h2>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Manage weekly rotational shifts (Alpha/Bravo), view daily deployed crew, and track gender workforce distribution for {stationName}.
+            Manage weekly duty schedules (ON DUTY / OFF DUTY), view daily deployed crew, and track gender workforce distribution for {stationName}.
           </p>
         </div>
 
@@ -350,8 +347,8 @@ export default function WeeklyDutyDetail({
                 <h3 className="text-base font-black text-black">Weekly Shift Schedule Matrix</h3>
                 <p className="text-xs text-zinc-500">
                   {isOwner
-                    ? "Click on any shift cell to cycle assignment: Shift Alpha (Day) -> Shift Bravo (Night) -> Off Duty."
-                    : "Official weekly rotational shift assignments for station personnel."}
+                    ? "Click on any shift cell to cycle assignment: ON DUTY -> OFF DUTY."
+                    : "Official weekly duty assignments for station personnel."}
                 </p>
               </div>
 
@@ -390,7 +387,7 @@ export default function WeeklyDutyDetail({
                 <table className="w-full text-left text-xs border-collapse min-w-[850px]">
                   <thead>
                     <tr className="bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wider">
-                      <th className="py-3 px-4 w-[240px]">Officer & Rank</th>
+                      <th className="py-3 px-4 w-[240px]">Name of Personnels</th>
                       {weekDates.map((wd) => (
                         <th key={wd.day} className="py-3 px-2 text-center border-l border-zinc-800">
                           <div>{wd.shortDay}</div>
@@ -416,43 +413,34 @@ export default function WeeklyDutyDetail({
                           </div>
                         </td>
                         {DAYS.map((day) => {
-                          const shiftVal = schedule[person.id]?.[day] || "alpha";
+                          const shiftVal = schedule[person.id]?.[day] || "on_duty";
                           return (
                             <td key={day} className="p-1.5 text-center border-r border-zinc-100">
                               <button
                                 onClick={() => cycleShift(person.id, day)}
                                 disabled={!isOwner}
                                 className={`w-full py-1.5 px-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
-                                  shiftVal === "alpha"
-                                    ? "bg-blue-100/80 text-blue-800 hover:bg-blue-200"
-                                    : shiftVal === "bravo"
-                                    ? "bg-purple-100/80 text-purple-800 hover:bg-purple-200"
+                                  shiftVal === "on_duty"
+                                    ? "bg-emerald-100/80 text-emerald-800 hover:bg-emerald-200"
                                     : "bg-zinc-100 text-zinc-400 hover:bg-zinc-200"
                                 } ${isOwner ? "cursor-pointer" : "cursor-default"}`}
                                 title={
                                   isOwner
                                     ? "Click to cycle shift"
-                                    : shiftVal === "alpha"
-                                    ? "Shift Alpha (Day)"
-                                    : shiftVal === "bravo"
-                                    ? "Shift Bravo (Night)"
-                                    : "Off Duty"
+                                    : shiftVal === "on_duty"
+                                    ? "ON DUTY"
+                                    : "OFF DUTY"
                                 }
                               >
-                                {shiftVal === "alpha" ? (
+                                {shiftVal === "on_duty" ? (
                                   <>
-                                    <Sun className="w-3 h-3 text-blue-600" />
-                                    <span>Alpha</span>
-                                  </>
-                                ) : shiftVal === "bravo" ? (
-                                  <>
-                                    <Moon className="w-3 h-3 text-purple-600" />
-                                    <span>Bravo</span>
+                                    <UserCheck className="w-3 h-3 text-emerald-600" />
+                                    <span>ON DUTY</span>
                                   </>
                                 ) : (
                                   <>
                                     <Coffee className="w-3 h-3 text-zinc-400" />
-                                    <span>Off</span>
+                                    <span>OFF DUTY</span>
                                   </>
                                 )}
                               </button>
@@ -470,19 +458,11 @@ export default function WeeklyDutyDetail({
             <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-zinc-600">
               <span className="font-bold text-zinc-800">Shift Key:</span>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-blue-100 border border-blue-300 inline-flex items-center justify-center">
-                  <Sun className="w-2 h-2 text-blue-600" />
+                <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300 inline-flex items-center justify-center">
+                  <UserCheck className="w-2 h-2 text-emerald-600" />
                 </span>
                 <span>
-                  <strong>Shift Alpha:</strong> Day Duty (08:00 – 20:00)
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-purple-100 border border-purple-300 inline-flex items-center justify-center">
-                  <Moon className="w-2 h-2 text-purple-600" />
-                </span>
-                <span>
-                  <strong>Shift Bravo:</strong> Night Duty (20:00 – 08:00)
+                  <strong>ON DUTY:</strong> Active Duty (24/7 Operations)
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -490,7 +470,7 @@ export default function WeeklyDutyDetail({
                   <Coffee className="w-2 h-2 text-zinc-400" />
                 </span>
                 <span>
-                  <strong>Off:</strong> Standby / Rest Day
+                  <strong>OFF DUTY:</strong> Standby / Rest Day
                 </span>
               </div>
             </div>
@@ -572,12 +552,12 @@ export default function WeeklyDutyDetail({
               </span>
               <div className="text-xs font-black text-emerald-950 mt-1 space-y-1">
                 <div className="flex justify-between">
-                  <span>Day (Alpha):</span>
-                  <span className="font-bold">{dailyAlphaCrew.length}</span>
+                  <span>ON DUTY:</span>
+                  <span className="font-bold">{dailyOnDutyCrew.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Night (Bravo):</span>
-                  <span className="font-bold">{dailyBravoCrew.length}</span>
+                  <span>OFF DUTY:</span>
+                  <span className="font-bold">{dailyOffDutyCrew.length}</span>
                 </div>
               </div>
             </div>
@@ -585,37 +565,37 @@ export default function WeeklyDutyDetail({
 
           {/* Daily Crew Sections */}
           <div className="space-y-6">
-            {/* SHIFT ALPHA (DAY CREW) */}
+            {/* ON DUTY CREW */}
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                    <Sun className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                    <UserCheck className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="text-sm font-black text-black">
-                      Shift Alpha • Day Crew (08:00 – 20:00)
+                      ON DUTY CREW (24/7 Operations)
                     </h4>
                     <p className="text-[11px] text-zinc-500">
-                      Primary daytime response force for fire calls and rescue operations.
+                      Active response force for fire calls, rescue operations, and emergency services.
                     </p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
-                  {dailyAlphaCrew.length} Assigned
+                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                  {dailyOnDutyCrew.length} Assigned
                 </span>
               </div>
 
-              {dailyAlphaCrew.length === 0 ? (
+              {dailyOnDutyCrew.length === 0 ? (
                 <div className="p-6 text-center bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-500">
-                  No personnel assigned to Shift Alpha for {selectedDay}.
+                  No personnel on duty for {selectedDay}.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {dailyAlphaCrew.map((p) => (
+                  {dailyOnDutyCrew.map((p) => (
                     <div
                       key={p.id}
-                      className="p-3.5 rounded-xl bg-white border border-blue-200 shadow-sm flex items-start justify-between gap-3"
+                      className="p-3.5 rounded-xl bg-white border border-emerald-200 shadow-sm flex items-start justify-between gap-3"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -634,7 +614,7 @@ export default function WeeklyDutyDetail({
                           <span>{p.contact}</span>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                         {p.badgeNo}
                       </span>
                     </div>
@@ -643,65 +623,7 @@ export default function WeeklyDutyDetail({
               )}
             </div>
 
-            {/* SHIFT BRAVO (NIGHT CREW) */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
-                    <Moon className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-black text-black">
-                      Shift Bravo • Night Relief (20:00 – 08:00)
-                    </h4>
-                    <p className="text-[11px] text-zinc-500">
-                      Night standby and active suppression unit for overnight emergencies.
-                    </p>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold">
-                  {dailyBravoCrew.length} Assigned
-                </span>
-              </div>
-
-              {dailyBravoCrew.length === 0 ? (
-                <div className="p-6 text-center bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-500">
-                  No personnel assigned to Shift Bravo for {selectedDay}.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {dailyBravoCrew.map((p) => (
-                    <div
-                      key={p.id}
-                      className="p-3.5 rounded-xl bg-white border border-purple-200 shadow-sm flex items-start justify-between gap-3"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold text-red-600 uppercase">
-                            {p.rank}
-                          </span>
-                          <span className="text-zinc-300">•</span>
-                          <span className={`text-[9px] font-bold uppercase ${p.gender === "female" ? "text-rose-600" : "text-blue-600"}`}>
-                            {p.gender}
-                          </span>
-                        </div>
-                        <h5 className="text-sm font-black text-black">{p.name}</h5>
-                        <p className="text-xs text-zinc-600 font-semibold">{p.position}</p>
-                        <div className="flex items-center gap-1 text-[11px] text-zinc-500 pt-1">
-                          <Phone className="w-3 h-3 text-red-600" />
-                          <span>{p.contact}</span>
-                        </div>
-                      </div>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-50 text-purple-700 border border-purple-200 shrink-0">
-                        {p.badgeNo}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* OFF-DUTY / REST DAY */}
+            {/* OFF DUTY / REST DAY */}
             {dailyOffDutyCrew.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
@@ -711,7 +633,7 @@ export default function WeeklyDutyDetail({
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-zinc-700">
-                        Off Duty / Standby Relief ({dailyOffDutyCrew.length})
+                        OFF DUTY / STANDBY RELIEF ({dailyOffDutyCrew.length})
                       </h4>
                       <p className="text-[11px] text-zinc-400">
                         Personnel on scheduled rest day or emergency callback reserve.
@@ -726,7 +648,7 @@ export default function WeeklyDutyDetail({
                       key={p.id}
                       className="px-3 py-1.5 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 border border-zinc-200"
                     >
-                      <UserCheck className="w-3.5 h-3.5 text-zinc-400" />
+                      <Coffee className="w-3.5 h-3.5 text-zinc-400" />
                       <span>{p.name}</span>
                       <span className="text-[10px] text-zinc-400 font-mono">({p.rank})</span>
                     </span>

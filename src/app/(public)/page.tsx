@@ -12,8 +12,8 @@ export default function PublicHome() {
         {/* Top Official Badge */}
         <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
           <span className="h-1.5 sm:h-2 w-1.5 sm:w-2 rounded-full bg-red-600 animate-pulse" />
-          <span className="hidden sm:inline">BFP SURIGAO DEL NORTE • COMMAND OPERATIONS PORTAL</span>
-          <span className="sm:hidden">BFP SURIGAO COMMAND PORTAL</span>
+          <span className="hidden sm:inline">BFP SDN PHQ • PROVINCIAL COMMAND OPERATIONS PORTAL</span>
+          <span className="sm:hidden">BFP SDN PHQ COMMAND PORTAL</span>
         </div>
 
         {/* Brand Icon & Heading */}
@@ -28,7 +28,7 @@ export default function PublicHome() {
           </h1>
 
           <p className="text-xs sm:text-sm text-zinc-600 max-w-xl mx-auto leading-relaxed px-2">
-            Restricted access system for Regional Administrators and stationed Fire Officers across Surigao del Norte. Please sign in or register to access the operational dashboard.
+            Restricted access system for Provincial Administrators and stationed Fire Officers across Surigao del Norte. Please sign in or register to access the operational dashboard.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export default function PublicHome() {
 
               <h2 className="text-lg sm:text-xl font-black text-black mb-1.5">Register Station / Member</h2>
               <p className="text-[11px] sm:text-xs text-zinc-600 leading-relaxed mb-4 sm:mb-6">
-                New station or officer? Submit your registration credentials for verification and approval by the Regional Administrator.
+                New station or officer? Submit your registration credentials for verification and approval by the Provincial Administrator.
               </p>
             </div>
 
@@ -96,7 +96,7 @@ export default function PublicHome() {
         {/* Security Notice */}
         <div className="pt-4 sm:pt-6 flex items-center justify-center gap-2 text-[10px] sm:text-xs text-zinc-500 font-medium px-2">
           <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-400" />
-          <span className="hidden sm:inline">Encrypted Official Access • Regional Administrator Clearance Required</span>
+          <span className="hidden sm:inline">Encrypted Official Access • Provincial Administrator Clearance Required</span>
           <span className="sm:hidden">Encrypted Official Access</span>
         </div>
       </div>

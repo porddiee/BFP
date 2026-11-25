@@ -14,8 +14,8 @@ export async function registerAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
-  const first_name = formData.get("first_name") as string;
-  const last_name = formData.get("last_name") as string;
+  const first_name = ((formData.get("station") || formData.get("first_name")) as string) || "";
+  const last_name = ((formData.get("province") || formData.get("last_name")) as string) || "";
   const contact_number = formData.get("contact_number") as string;
 
   // Validation

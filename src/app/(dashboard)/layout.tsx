@@ -42,8 +42,8 @@ export default async function DashboardLayout({
       />
 
       {/* Main Content Area (Offset for collapsed sidebar width on desktop) */}
-      <div className="flex-1 min-w-0 lg:pl-[72px] flex flex-col">
-        <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="flex-1 min-w-0 lg:pl-[72px] flex flex-col print:pl-0 print:m-0 print:w-full print:max-w-none">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 print:p-0 print:m-0 print:max-w-none">
           {children}
         </main>
       </div>

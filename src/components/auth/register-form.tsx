@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { registerAction } from "@/app/actions/auth";
-import { User, Mail, Phone, Lock, Eye, EyeOff, Loader2, AlertCircle, ShieldAlert } from "lucide-react";
+import { User, Mail, Phone, Lock, Eye, EyeOff, Loader2, AlertCircle, ShieldAlert, Building2, MapPin } from "lucide-react";
 
 export default function RegisterForm() {
   const [error, setError] = useState("");
@@ -26,15 +26,15 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Name Fields (2 Columns) */}
+      {/* Station & Province Fields (2 Columns) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="first_name" className="block text-xs font-bold text-zinc-800 uppercase tracking-wider mb-2">
-            First Name
+            Station
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
-              <User className="w-4 h-4" />
+              <Building2 className="w-4 h-4" />
             </div>
             <input
               id="first_name"
@@ -42,18 +42,18 @@ export default function RegisterForm() {
               type="text"
               required
               className="w-full pl-10 pr-3.5 py-3 rounded-xl bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-sm font-medium"
-              placeholder="e.g. Juan"
+              placeholder="e.g. Surigao City Fire Station"
             />
           </div>
         </div>
 
         <div>
           <label htmlFor="last_name" className="block text-xs font-bold text-zinc-800 uppercase tracking-wider mb-2">
-            Last Name
+            Province
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
-              <User className="w-4 h-4" />
+              <MapPin className="w-4 h-4" />
             </div>
             <input
               id="last_name"
@@ -61,7 +61,7 @@ export default function RegisterForm() {
               type="text"
               required
               className="w-full pl-10 pr-3.5 py-3 rounded-xl bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-sm font-medium"
-              placeholder="e.g. Dela Cruz"
+              placeholder="e.g. Surigao del Norte"
             />
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function RegisterForm() {
       <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-600 text-xs flex items-start gap-2.5">
         <ShieldAlert className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          Upon submitting registration, your account will enter <strong className="text-black">Pending Approval</strong> status. An authorized district administrator will verify your station affiliation before granting operational access.
+          Upon submitting registration, your account will enter <strong className="text-black">Pending Approval</strong> status. An authorized provincial administrator will verify your station affiliation before granting operational access.
         </p>
       </div>
 

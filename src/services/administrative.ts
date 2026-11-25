@@ -21,6 +21,53 @@ export function detectGender(firstName: string = ""): "male" | "female" {
   return "male";
 }
 
+/**
+ * Normalizes station districts into the standard categories:
+ * - "Mainland Surigao del Norte" (all Mainland stations including Surigao City, Alegria, etc.)
+ * - "Siargao" (all Siargao Island stations including Dapa, General Luna, Del Carmen, etc.)
+ */
+export function normalizeDistrict(
+  district?: string | null,
+  stationName: string = "",
+  address: string = ""
+): "Mainland Surigao del Norte" | "Siargao" | string {
+  const d = (district || "").toLowerCase().trim();
+  const name = stationName.toLowerCase().trim();
+  const addr = address.toLowerCase().trim();
+
+  // If Siargao or Siargao island municipalities
+  if (
+    d.includes("siargao") ||
+    name.includes("siargao") ||
+    addr.includes("siargao") ||
+    name.includes("dapa") ||
+    name.includes("general luna") ||
+    name.includes("del carmen") ||
+    name.includes("pilar") ||
+    name.includes("san benito") ||
+    name.includes("san isidro") ||
+    name.includes("santa monica") ||
+    name.includes("burgos") ||
+    name.includes("socorro") ||
+    addr.includes("dapa")
+  ) {
+    return "Siargao";
+  }
+
+  // All other Surigao stations, District 1, Dist 2, Surigao City belong to Mainland Surigao del Norte
+  if (
+    d.includes("mainland") ||
+    d.includes("district 1") ||
+    d.includes("dist 2") ||
+    d.includes("surigao") ||
+    !d
+  ) {
+    return "Mainland Surigao del Norte";
+  }
+
+  return district || "Mainland Surigao del Norte";
+}
+
 export interface StationAdministrativeRecord {
   id: string;
   stationName: string;
@@ -80,6 +127,23 @@ const KNOWN_STATION_METADATA: Record<string, Partial<StationAdministrativeRecord
     remarks: "100% Operational Readiness. Municipal frontline suppression unit and water rescue detachment on 24/7 alert.",
     operationalStatus: "operational",
   },
+  // Dapa Municipal Fire Station (Siargao)
+  "937702eb-303f-47d7-9aa6-119b5a34e46d": {
+    marshalName: "SFO3 Marlon Virtudazo",
+    marshalRank: "Senior Fire Officer 3",
+    marshalPosition: "Municipal Fire Marshal / Station Commander",
+    personnelMale: 7,
+    personnelFemale: 3,
+    personnelTotal: 10,
+    firetruckBfp: 1, // Isuzu Forward Fast-Attack Pumper
+    firetruckLgu: 1, // LGU Dapa Water Tender
+    firetruckTotal: 2,
+    ambulanceBfp: 1, // Toyota HiAce Emergency Ambulance
+    ambulanceLgu: 1, // MDRRMO Dapa BLS Ambulance
+    ambulanceTotal: 2,
+    remarks: "100% Operational Readiness. Siargao Island frontline emergency response command on 24/7 alert.",
+    operationalStatus: "operational",
+  },
 };
 
 export async function getAdministrativeUpdatesData(): Promise<StationAdministrativeRecord[]> {
@@ -87,7 +151,17 @@ export async function getAdministrativeUpdatesData(): Promise<StationAdministrat
   const records: StationAdministrativeRecord[] = [];
 
   for (const station of stations) {
-    const known = KNOWN_STATION_METADATA[station.id];
+    let known = KNOWN_STATION_METADATA[station.id];
+    if (!known) {
+      const lower = station.name.toLowerCase();
+      if (lower.includes("dapa") || lower.includes("siargao")) {
+        known = KNOWN_STATION_METADATA["937702eb-303f-47d7-9aa6-119b5a34e46d"];
+      } else if (lower.includes("alegria")) {
+        known = KNOWN_STATION_METADATA["fe2f238c-94e8-4f53-874a-5ff760de0ddf"];
+      } else if (lower.includes("surigao")) {
+        known = KNOWN_STATION_METADATA["8d5f9a9b-d989-470b-8834-5a704f3899cc"];
+      }
+    }
 
     // Fetch live database members and equipment
     let members: any[] = [];
@@ -175,7 +249,7 @@ export async function getAdministrativeUpdatesData(): Promise<StationAdministrat
     records.push({
       id: station.id,
       stationName: station.name,
-      district: station.district || "Surigao del Norte",
+      district: normalizeDistrict(station.district, station.name, station.address),
       address: station.address,
       contactNumber: station.contact_number || "Not listed",
       email: station.email || "station@bfp.gov.ph",

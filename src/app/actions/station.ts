@@ -550,6 +550,60 @@ export async function addFireIncidentAction(formData: FormData) {
 
     const adminSupabase = authCheck.adminSupabase;
 
+    // Handle file uploads
+    const imageFiles = formData.getAll("images") as File[];
+    const documentFiles = formData.getAll("documents") as File[];
+    const uploadedUrls: Array<{ url: string; category: string; name: string }> = [];
+
+    // Upload images
+    for (const file of imageFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/fire/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: 'image',
+            name: file.name
+          });
+        }
+      }
+    }
+
+    // Upload documents with category
+    const documentCategory = (formData.get("document_category") as string) || "initial_report";
+    for (const file of documentFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/fire/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: documentCategory,
+            name: file.name
+          });
+        }
+      }
+    }
+
     const { error: insErr } = await adminSupabase.from("fire_incidents").insert({
       station_id: stationId,
       incident_type: incidentType,
@@ -558,6 +612,7 @@ export async function addFireIncidentAction(formData: FormData) {
       description,
       status: status as any,
       reported_at: new Date().toISOString(),
+      attachments: uploadedUrls.length > 0 ? uploadedUrls : null,
     });
 
     if (insErr) {
@@ -614,6 +669,131 @@ export async function updateFireIncidentStatusAction(formData: FormData) {
     return { success: true };
   } catch (err) {
     console.error("updateFireIncidentStatusAction error:", err);
+    return { error: err instanceof Error ? err.message : "Failed to update incident", success: false };
+  }
+}
+
+/**
+ * Update Fire Incident Details
+ */
+export async function updateFireIncidentAction(formData: FormData) {
+  try {
+    const stationId = formData.get("stationId") as string;
+    const incidentId = formData.get("incidentId") as string;
+    const incidentType = (formData.get("incident_type") as string || "").trim();
+    const location = (formData.get("location") as string || "").trim();
+    const severity = (formData.get("severity") as string || "medium").trim();
+    const description = (formData.get("description") as string || "").trim();
+    const status = (formData.get("status") as string || "active").trim();
+
+    if (!stationId || !incidentId) {
+      return { error: "Station ID and Incident ID are required.", success: false };
+    }
+
+    const authCheck = await verifyStationOwner(stationId);
+    if (!authCheck.authorized || !authCheck.adminSupabase) {
+      return { error: authCheck.error || "Unauthorized", success: false };
+    }
+
+    const adminSupabase = authCheck.adminSupabase;
+
+    // Get existing incident to preserve current attachments
+    const { data: existingIncident } = await adminSupabase
+      .from("fire_incidents")
+      .select("attachments")
+      .eq("id", incidentId)
+      .single();
+
+    const existingAttachments = existingIncident?.attachments || [];
+
+    // Handle file uploads
+    const imageFiles = formData.getAll("images") as File[];
+    const documentFiles = formData.getAll("documents") as File[];
+    const uploadedUrls: Array<{ url: string; category: string; name: string }> = [];
+
+    // Upload images
+    for (const file of imageFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/fire/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: 'image',
+            name: file.name
+          });
+        }
+      }
+    }
+
+    // Upload documents with category
+    const documentCategory = (formData.get("document_category") as string) || "initial_report";
+    for (const file of documentFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/fire/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: documentCategory,
+            name: file.name
+          });
+        }
+      }
+    }
+
+    // Merge existing attachments with new ones
+    const allAttachments = [...existingAttachments, ...uploadedUrls];
+
+    const updates: Record<string, any> = {
+      incident_type: incidentType,
+      location,
+      severity,
+      description,
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (status === "resolved") {
+      updates.resolved_at = new Date().toISOString();
+    }
+
+    if (uploadedUrls.length > 0) {
+      updates.attachments = allAttachments;
+    }
+
+    const { error: updErr } = await adminSupabase
+      .from("fire_incidents")
+      .update(updates)
+      .eq("id", incidentId)
+      .eq("station_id", stationId);
+
+    if (updErr) {
+      return { error: `Failed to update incident: ${updErr.message}`, success: false };
+    }
+
+    revalidateStationPaths(stationId);
+    return { success: true };
+  } catch (err) {
+    console.error("updateFireIncidentAction error:", err);
     return { error: err instanceof Error ? err.message : "Failed to update incident", success: false };
   }
 }
@@ -687,6 +867,60 @@ export async function addEMSIncidentAction(formData: FormData) {
 
     const adminSupabase = authCheck.adminSupabase;
 
+    // Handle file uploads
+    const imageFiles = formData.getAll("images") as File[];
+    const documentFiles = formData.getAll("documents") as File[];
+    const uploadedUrls: Array<{ url: string; category: string; name: string }> = [];
+
+    // Upload images
+    for (const file of imageFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/ems/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: 'image',
+            name: file.name
+          });
+        }
+      }
+    }
+
+    // Upload documents with category
+    const documentCategory = (formData.get("document_category") as string) || "initial_report";
+    for (const file of documentFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/ems/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: documentCategory,
+            name: file.name
+          });
+        }
+      }
+    }
+
     const { error: insErr } = await adminSupabase.from("ems_incidents").insert({
       station_id: stationId,
       incident_type: incidentType,
@@ -695,6 +929,7 @@ export async function addEMSIncidentAction(formData: FormData) {
       description,
       status: status as any,
       reported_at: new Date().toISOString(),
+      attachments: uploadedUrls.length > 0 ? uploadedUrls : null,
     });
 
     if (insErr) {
@@ -751,6 +986,131 @@ export async function updateEMSIncidentStatusAction(formData: FormData) {
     return { success: true };
   } catch (err) {
     console.error("updateEMSIncidentStatusAction error:", err);
+    return { error: err instanceof Error ? err.message : "Failed to update EMS incident", success: false };
+  }
+}
+
+/**
+ * Update EMS Incident Details
+ */
+export async function updateEMSIncidentAction(formData: FormData) {
+  try {
+    const stationId = formData.get("stationId") as string;
+    const incidentId = formData.get("incidentId") as string;
+    const incidentType = (formData.get("incident_type") as string || "").trim();
+    const location = (formData.get("location") as string || "").trim();
+    const severity = (formData.get("severity") as string || "medium").trim();
+    const description = (formData.get("description") as string || "").trim();
+    const status = (formData.get("status") as string || "active").trim();
+
+    if (!stationId || !incidentId) {
+      return { error: "Station ID and Incident ID are required.", success: false };
+    }
+
+    const authCheck = await verifyStationOwner(stationId);
+    if (!authCheck.authorized || !authCheck.adminSupabase) {
+      return { error: authCheck.error || "Unauthorized", success: false };
+    }
+
+    const adminSupabase = authCheck.adminSupabase;
+
+    // Get existing incident to preserve current attachments
+    const { data: existingIncident } = await adminSupabase
+      .from("ems_incidents")
+      .select("attachments")
+      .eq("id", incidentId)
+      .single();
+
+    const existingAttachments = existingIncident?.attachments || [];
+
+    // Handle file uploads
+    const imageFiles = formData.getAll("images") as File[];
+    const documentFiles = formData.getAll("documents") as File[];
+    const uploadedUrls: Array<{ url: string; category: string; name: string }> = [];
+
+    // Upload images
+    for (const file of imageFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/ems/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: 'image',
+            name: file.name
+          });
+        }
+      }
+    }
+
+    // Upload documents with category
+    const documentCategory = (formData.get("document_category") as string) || "initial_report";
+    for (const file of documentFiles) {
+      if (file instanceof File && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `incidents/ems/${stationId}/${fileName}`;
+
+        const { error: uploadError } = await adminSupabase.storage
+          .from('incident-files')
+          .upload(filePath, file);
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = adminSupabase.storage
+            .from('incident-files')
+            .getPublicUrl(filePath);
+          uploadedUrls.push({
+            url: publicUrl,
+            category: documentCategory,
+            name: file.name
+          });
+        }
+      }
+    }
+
+    // Merge existing attachments with new ones
+    const allAttachments = [...existingAttachments, ...uploadedUrls];
+
+    const updates: Record<string, any> = {
+      incident_type: incidentType,
+      location,
+      severity,
+      description,
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (status === "resolved") {
+      updates.resolved_at = new Date().toISOString();
+    }
+
+    if (uploadedUrls.length > 0) {
+      updates.attachments = allAttachments;
+    }
+
+    const { error: updErr } = await adminSupabase
+      .from("ems_incidents")
+      .update(updates)
+      .eq("id", incidentId)
+      .eq("station_id", stationId);
+
+    if (updErr) {
+      return { error: `Failed to update EMS record: ${updErr.message}`, success: false };
+    }
+
+    revalidateStationPaths(stationId);
+    return { success: true };
+  } catch (err) {
+    console.error("updateEMSIncidentAction error:", err);
     return { error: err instanceof Error ? err.message : "Failed to update EMS incident", success: false };
   }
 }

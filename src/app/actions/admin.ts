@@ -7,7 +7,7 @@ export async function approveRegistrationAction(profileId: string) {
   try {
     const current = await getCurrentProfile();
     if (!current || current.role !== "admin") {
-      return { error: "Unauthorized: Only Regional Admin can approve stations and personnel." };
+      return { error: "Unauthorized: Only Provincial Admin can approve stations and personnel." };
     }
 
     await approveProfile(profileId);
@@ -23,7 +23,7 @@ export async function rejectRegistrationAction(profileId: string) {
   try {
     const current = await getCurrentProfile();
     if (!current || current.role !== "admin") {
-      return { error: "Unauthorized: Only Regional Admin can reject registrations." };
+      return { error: "Unauthorized: Only Provincial Admin can reject registrations." };
     }
 
     await rejectProfile(profileId);

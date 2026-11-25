@@ -2,11 +2,11 @@ import { getStationById, getUserStation } from "@/services/stations";
 import { getStationMembers } from "@/services/personnel";
 import { getCurrentProfile } from "@/services/auth";
 import Link from "next/link";
-import { ArrowLeft, Users, Shield, Phone, Mail, Clock, CheckCircle2, UserX, Search, Filter, Lock } from "lucide-react";
+import { ArrowLeft, Users, Shield, Phone, Mail, Clock, CheckCircle2, UserX, Search, Filter, Lock, Calendar } from "lucide-react";
 import { notFound } from "next/navigation";
 import PersonnelRosterView from "@/components/stations/personnel-roster-view";
 import AddPersonnelModal from "@/components/stations/add-personnel-modal";
-import WeeklyDutyDetail from "@/components/stations/weekly-duty-detail";
+import { RotatingSeal } from "@/components/layout/rotating-seal";
 
 const FEMALE_NAMES = new Set([
   "maria", "cristina", "arlene", "leizel", "maricar", "mary", "jane", "sarah", "grace", "ana",
@@ -143,39 +143,48 @@ export default async function StationPersonnelPage({
               </p>
             </div>
 
+            {/* Rotating Seal */}
+            <RotatingSeal />
+
             {/* Quick Metrics & Add Action */}
             <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto shrink-0">
-            <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-1 sm:flex-initial">
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
-                <span className="block text-lg sm:text-xl font-black text-white">{finalRoster.length}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Total</span>
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-1 sm:flex-initial">
+                <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
+                  <span className="block text-lg sm:text-xl font-black text-white">{finalRoster.length}</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-100">Total</span>
+                </div>
+                <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/20 border border-white/30 text-center">
+                  <span className="block text-lg sm:text-xl font-black text-white">{onDutyCount}</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-200">On Duty</span>
+                </div>
+                <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
+                  <span className="block text-lg sm:text-xl font-black text-white/80">{offDutyCount}</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-200">Off Duty</span>
+                </div>
               </div>
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/20 border border-white/30 text-center">
-                <span className="block text-lg sm:text-xl font-black text-white">{onDutyCount}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-200">On Duty</span>
-              </div>
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center">
-                <span className="block text-lg sm:text-xl font-black text-white/80">{offDutyCount}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-red-200">Off Duty</span>
+              <div className="flex flex-col sm:flex-row gap-2">
+                {finalRoster.length > 0 && (
+                  <Link
+                    href={`/stations/${stationId}/personnel/schedule`}
+                    className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-white/20 border border-white/30 text-center flex items-center justify-center gap-1.5 text-white hover:bg-white/30 transition-colors"
+                  >
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Duty Schedule</span>
+                  </Link>
+                )}
+                {isOwner ? (
+                  <AddPersonnelModal stationId={stationId} />
+                ) : isAdmin ? (
+                  <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center flex items-center justify-center gap-1.5 text-white/80">
+                    <Lock className="w-3.5 h-3.5 shrink-0" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Provincial Oversight (Read-Only)</span>
+                  </div>
+                ) : null}
               </div>
             </div>
-            {isOwner ? (
-              <AddPersonnelModal stationId={stationId} />
-            ) : isAdmin ? (
-              <div className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-center flex items-center justify-center gap-1.5 text-white/80">
-                <Lock className="w-3.5 h-3.5 shrink-0" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Regional Oversight (Read-Only)</span>
-              </div>
-            ) : null}
           </div>
         </div>
       </div>
-    </div>
-
-      {/* Weekly Duty Detail Section */}
-      {finalRoster.length > 0 && (
-        <WeeklyDutyDetail roster={finalRoster} stationName={station.name} stationId={stationId} isOwner={isOwner} />
-      )}
 
       {/* Interactive Personnel Roster or Empty State */}
       {finalRoster.length === 0 ? (
@@ -187,7 +196,7 @@ export default async function StationPersonnelPage({
           <p className="text-xs text-zinc-500 max-w-sm mx-auto">
             {isOwner
               ? "This station does not have any personnel or officers enrolled. Click \"Add Personnel\" above to enroll your first station member."
-              : `This station does not have any personnel or officers enrolled yet.`}
+              : "This station does not have any personnel or officers enrolled yet."}
           </p>
         </div>
       ) : (

@@ -62,7 +62,7 @@ export default function RegistrationApprovalList({ initialProfiles }: Props) {
           </div>
           <h3 className="text-lg font-bold text-black mb-1">All Clear - No Pending Registrations</h3>
           <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-            When personnel or stations register on the website, they will appear here awaiting regional admin clearance.
+            When personnel or stations register on the website, they will appear here awaiting provincial admin clearance.
           </p>
         </div>
       ) : (

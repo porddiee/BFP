@@ -95,6 +95,7 @@ export interface FireIncident {
   resolved_at: string | null;
   created_at: string;
   updated_at: string;
+  attachments?: Array<{ url: string; category: string; name: string }> | null;
 }
 
 export interface EMSIncident {
@@ -109,4 +110,5 @@ export interface EMSIncident {
   resolved_at: string | null;
   created_at: string;
   updated_at: string;
+  attachments?: Array<{ url: string; category: string; name: string }> | null;
 }
